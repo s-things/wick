@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"reflect"
 )
 
 func subscribe(URLSub string, realmSub string, topicSub string){
@@ -26,9 +27,12 @@ func subscribe(URLSub string, realmSub string, topicSub string){
 
 	// Define function to handle events received.
 	eventHandler := func(event *wamp.Event) {
-		logger.Println("Received ", topicSub, " event")
 		if len(event.Arguments) != 0 {
-			logger.Println("  Event Message:", event.Arguments[0])
+			fmt.Println("args :", event.Arguments[0])
+		}
+		if len(event.Arguments) != 0 {
+			m := event.ArgumentsKw
+			fmt.Println(reflect.ValueOf(m).MapKeys()[0], ": ", m["kwargs"])
 		}
 	}
 
@@ -56,7 +60,7 @@ func subscribe(URLSub string, realmSub string, topicSub string){
 
 }
 
-func publish(URLPub string, realmPub string, topicPub string, argsList wamp.List) {
+func publish(URLPub string, realmPub string, topicPub string, argsList []string, kwargsMap map[string]string) {
 	logger := log.New(os.Stdout, "Publisher> ", 0)
 	cfg := client.Config{
 		Realm:  realmPub,
@@ -71,7 +75,7 @@ func publish(URLPub string, realmPub string, topicPub string, argsList wamp.List
 	defer publisher.Close()
 
 	// Publish to topic.
-	err = publisher.Publish(topicPub, nil,argsList, nil)
+	err = publisher.Publish(topicPub, nil,wamp.List{argsList}, wamp.Dict{"kwargs": kwargsMap})
 	if err != nil {
 		logger.Fatal("publish error:", err)
 	}
@@ -92,7 +96,13 @@ func register(URLReg string, realmReg string, procedureReg string){
 	defer register.Close()
 
 	eventHandler:= func(ctx context.Context, inv *wamp.Invocation) client.InvokeResult {
-		fmt.Println(inv.Arguments,inv.ArgumentsKw)
+		if len(inv.Arguments) != 0 {
+			fmt.Println("args :", inv.Arguments[0])
+		}
+		if len(inv.Arguments) != 0 {
+			m := inv.ArgumentsKw
+			fmt.Println(reflect.ValueOf(m).MapKeys()[0], ": ", m["kwargs"])
+		}
 		return client.InvokeResult{Args: wamp.List{inv.Arguments}}
 	}
 
@@ -120,9 +130,8 @@ func register(URLReg string, realmReg string, procedureReg string){
 
 }
 
-func call(URLCal string, realmCal string, procedureCal string, argsList wamp.List){
+func call(URLCal string, realmCal string, procedureCal string, argsList []string, kwargsMap map[string]string){
 	logger := log.New(os.Stderr, "Caller> ", 0)
-
 
 	cfg := client.Config{
 		Realm:  realmCal,
@@ -138,12 +147,7 @@ func call(URLCal string, realmCal string, procedureCal string, argsList wamp.Lis
 
 	ctx := context.Background()
 
-	result, err := caller.Call(ctx, procedureCal, nil, argsList, nil, nil)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	for i := range result.Arguments {
-		locTime, _ := wamp.AsString(result.Arguments[i])
-		logger.Println(locTime)
-	}
+	caller.Call(ctx, procedureCal, nil, wamp.List{argsList}, wamp.Dict{"kwargs": kwargsMap}, nil)
+
+	logger.Println("Call the procedure ", procedureCal)
 }

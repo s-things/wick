@@ -13,7 +13,8 @@ var (
 	urlArgPub   = publishCommand.Arg("url", "url").Required().String()
 	realmArgPub = publishCommand.Arg("realm", "realmSub").Required().String()
 	topicArgPub = publishCommand.Arg("topic", "topic name").Required().String()
-	argumentsFlagPub = publishCommand.Flag("arguments","for giving arguments").Short('a').Strings()
+	argumentsFlagPub = publishCommand.Flag("args","give the arguments").Short('a').Strings()
+	kwargsFlagPub = publishCommand.Flag("kwargs", "give the keyword arguments").Short('k').StringMap()
 
 	registerCommand  = kingpin.Command("register", "registering a procedure.")
 	urlArgReg   = registerCommand.Arg("url", "url").Required().String()
@@ -24,6 +25,8 @@ var (
 	urlArgCal   = callCommand.Arg("url", "url").Required().String()
 	realmArgCal = callCommand.Arg("realm", "realmSub").Required().String()
 	topicArgCal = callCommand.Arg("procedure", "procedure name").Required().String()
+	argumentsFlagCal = callCommand.Flag("args","give the arguments").Short('a').Strings()
+	kwargsFlagCal = callCommand.Flag("kwargs", "give the keyword arguments").Short('k').StringMap()
 )
 
 func main() {
@@ -31,10 +34,10 @@ func main() {
 		case "subscribe":
 			subscribe(*URLArgSub, *realmArgSub, *topicArgSub)
 		case "publish":
-			publish(*urlArgPub, *realmArgPub, *topicArgPub, nil)
+			publish(*urlArgPub, *realmArgPub, *topicArgPub, *argumentsFlagPub, *kwargsFlagPub)
 		case "register":
 			register(*urlArgReg, *realmArgReg, *topicArgReg)
 		case "call":
-			call(*urlArgCal, *realmArgCal, *topicArgCal, nil)
+			call(*urlArgCal, *realmArgCal, *topicArgCal, *argumentsFlagCal, *kwargsFlagCal)
 	}
 }
