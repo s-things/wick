@@ -6,7 +6,7 @@ import (
 var (
 	subscribeCommand = kingpin.Command("subscribe", "subscribe a topic.")
 	URLArgSub   = subscribeCommand.Arg("url", "url").Required().String()
-	realmArgSub = subscribeCommand.Arg("realmS", "realmSub").Required().String()
+	realmArgSub = subscribeCommand.Arg("realm", "realmSub").Required().String()
 	topicArgSub = subscribeCommand.Arg("topic", "topic name").Required().String()
 
 	publishCommand  = kingpin.Command("publish", "publishing a topic.")
