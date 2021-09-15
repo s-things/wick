@@ -12,9 +12,9 @@ var (
 	publishCommand  = kingpin.Command("publish", "publishing a topic.")
 	urlArgPub   = publishCommand.Arg("url", "url").Required().String()
 	realmArgPub = publishCommand.Arg("realm", "realmSub").Required().String()
-	topicArgPub = publishCommand.Arg("topic", "topic name").Required().String()
-	argumentsFlagPub = publishCommand.Flag("args","give the arguments").Short('a').Strings()
-	kwargsFlagPub = publishCommand.Flag("kwargs", "give the keyword arguments").Short('k').StringMap()
+	topicArgPub     = publishCommand.Arg("topic", "topic name").Required().String()
+	argumentsArgPub = publishCommand.Arg("args","give the arguments").Strings()
+	kwargsFlagPub   = publishCommand.Flag("kwargs", "give the keyword arguments").Short('k').StringMap()
 
 	registerCommand  = kingpin.Command("register", "registering a procedure.")
 	urlArgReg   = registerCommand.Arg("url", "url").Required().String()
@@ -24,9 +24,9 @@ var (
 	callCommand  = kingpin.Command("call", "calling a procedure.")
 	urlArgCal   = callCommand.Arg("url", "url").Required().String()
 	realmArgCal = callCommand.Arg("realm", "realmSub").Required().String()
-	topicArgCal = callCommand.Arg("procedure", "procedure name").Required().String()
-	argumentsFlagCal = callCommand.Flag("args","give the arguments").Short('a').Strings()
-	kwargsFlagCal = callCommand.Flag("kwargs", "give the keyword arguments").Short('k').StringMap()
+	topicArgCal     = callCommand.Arg("procedure", "procedure name").Required().String()
+	argumentsArgCal = callCommand.Arg("args","give the arguments").Strings()
+	kwargsFlagCal   = callCommand.Flag("kwargs", "give the keyword arguments").Short('k').StringMap()
 )
 
 func main() {
@@ -34,10 +34,10 @@ func main() {
 		case "subscribe":
 			subscribe(*URLArgSub, *realmArgSub, *topicArgSub)
 		case "publish":
-			publish(*urlArgPub, *realmArgPub, *topicArgPub, *argumentsFlagPub, *kwargsFlagPub)
+			publish(*urlArgPub, *realmArgPub, *topicArgPub, *argumentsArgPub, *kwargsFlagPub)
 		case "register":
 			register(*urlArgReg, *realmArgReg, *topicArgReg)
 		case "call":
-			call(*urlArgCal, *realmArgCal, *topicArgCal, *argumentsFlagCal, *kwargsFlagCal)
+			call(*urlArgCal, *realmArgCal, *topicArgCal, *argumentsArgCal, *kwargsFlagCal)
 	}
 }

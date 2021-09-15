@@ -37,6 +37,8 @@ func subscribe(URLSub string, realmSub string, topicSub string){
 					fmt.Println(value)
 				}
 			}
+		} else{
+			fmt.Println("args : {}")
 		}
 		i := 1
 		if len(event.ArgumentsKw) != 0 {
@@ -49,6 +51,8 @@ func subscribe(URLSub string, realmSub string, topicSub string){
 				}
 				i++
 			}
+		} else {
+			fmt.Println("kwargs : {}")
 		}
 	}
 
@@ -130,6 +134,8 @@ func register(URLReg string, realmReg string, procedureReg string){
 					fmt.Println(value)
 				}
 			}
+		}else{
+			fmt.Println("args : {}")
 		}
 		i := 1
 		if len(inv.ArgumentsKw) != 0 {
@@ -142,6 +148,8 @@ func register(URLReg string, realmReg string, procedureReg string){
 				}
 				i++
 			}
+		} else {
+			fmt.Println("kwargs : {}")
 		}
 		return client.InvokeResult{Args: wamp.List{inv.Arguments}}
 	}
