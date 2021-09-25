@@ -65,15 +65,15 @@ func main() {
 		case "publish":
 			publish(*urlFlagPub, *realmFlagPub, *topicArgPub, *argumentsArgPub, *kwargsFlagPub)
 		case "register":
-			if *bashFlagReg != nil && *shellFlagReg == nil && *pythonFlagReg == nil && execFlagReg == nil {
+			if *bashFlagReg != nil && *shellFlagReg == nil && *pythonFlagReg == nil && *execFlagReg == "" {
 				register(*urlFlagReg, *realmFlagReg, *topicArgReg, *bashFlagReg,"bash")
-			} else if *shellFlagReg != nil && *bashFlagReg == nil && *pythonFlagReg ==nil && execFlagReg == nil {
+			} else if *shellFlagReg != nil && *bashFlagReg == nil && *pythonFlagReg ==nil && *execFlagReg == "" {
 				register(*urlFlagReg, *realmFlagReg, *topicArgReg, *shellFlagReg,"sh")
-			} else if *pythonFlagReg != nil && *bashFlagReg == nil && *shellFlagReg == nil && execFlagReg == nil {
+			} else if *pythonFlagReg != nil && *bashFlagReg == nil && *shellFlagReg == nil && *execFlagReg == "" {
 				register(*urlFlagReg, *realmFlagReg, *topicArgReg, *pythonFlagReg,"python3")
 			} else if execFlagReg != nil && *bashFlagReg == nil && *shellFlagReg == nil && *pythonFlagReg ==nil {
 				register(*urlFlagReg, *realmFlagReg, *topicArgReg, nil, *execFlagReg)
-			} else if *bashFlagReg == nil && *shellFlagReg == nil && *pythonFlagReg == nil && execFlagReg == nil {
+			} else if *bashFlagReg == nil && *shellFlagReg == nil && *pythonFlagReg == nil && *execFlagReg == "" {
 				register(*urlFlagReg, *realmFlagReg, *topicArgReg, nil,"")
 			}else {
 				fmt.Println("Please use one type for running script")
