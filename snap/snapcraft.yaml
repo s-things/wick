@@ -19,5 +19,4 @@ apps:
     command: bin/wamp-cli
     plugs:
       - network
-      - network-bind
       - home
