@@ -25,22 +25,15 @@ package main
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	client2 "github.com/gammazero/nexus/client"
-	"github.com/gammazero/nexus/router/auth"
-	"github.com/gammazero/nexus/transport"
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/gammazero/nexus/v3/wamp/crsign"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
 	"strings"
-	"testing"
-	"time"
 )
 
 func subscribe(URLSub string, realmSub string, topicSub string){
@@ -245,7 +238,6 @@ func call(URLCal string, realmCal string, procedureCal string, argsList []string
 	cfg := client.Config{
 		Realm:  realmCal,
 		Logger: logger,
-		HelloDetails: {},
 	}
 
 	// Connect caller client
@@ -302,155 +294,4 @@ func execute(command string) (error, string, string) {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	return err, stdout.String(), stderr.String()
-}
-
-type testKeyStore struct {
-	provider string
-	secret   string
-	ticket   string
-	cookie   *http.Cookie
-
-	authByCookie bool
-}
-
-const (
-	goodSecret = "password"
-)
-
-var tks = &testKeyStore{
-	provider: "static",
-	secret:   goodSecret,
-}
-
-func (ks *testKeyStore) AuthKey(authid, authmethod string) ([]byte, error) {
-	if authid != "test" {
-		return nil, errors.New("no such user: " + authid)
-	}
-	switch authmethod {
-	case "wampcra":
-		// Lookup the user's key.
-		return []byte(ks.secret), nil
-	case "ticket":
-		return []byte(ks.ticket), nil
-	}
-	return nil, errors.New("unsupported authmethod")
-}
-
-func (ks *testKeyStore) AuthRole(authid string) (string, error) {
-	if authid != "test" {
-		return "", errors.New("no such user: " + authid)
-	}
-	return "user", nil
-}
-
-func (ks *testKeyStore) PasswordInfo(authid string) (string, int, int) {
-	return "", 0, 0
-}
-
-func (ks *testKeyStore) Provider() string { return ks.provider }
-
-func (ks *testKeyStore) AlreadyAuth(authid string, details wamp.Dict) bool {
-	v, err := wamp.DictValue(details, []string{"transport", "auth", "cookie"})
-	if err != nil {
-		// No tracking cookie, so not auth.
-		return false
-	}
-	cookie := v.(*http.Cookie)
-	// Check if tracking cookie matches cookie of previously good client.
-	if cookie.Value == ks.cookie.Value {
-		ks.authByCookie = true
-		return true
-	}
-	return false
-}
-
-
-func TestCRAuth(t *testing.T) {
-	cp, rp := transport.LinkedPeers()
-	defer cp.Close()
-	defer rp.Close()
-	go cliRsp(cp)
-
-	crAuth := auth.NewCRAuthenticator(tks, time.Second)
-	sid := wamp.ID(212)
-
-	// Test with missing authid
-	details := wamp.Dict{}
-	welcome, err := crAuth.Authenticate(sid, details, rp)
-	if err == nil {
-		t.Fatal("expected error with missing authid")
-	}
-
-	// Test with unknown authid.
-	details["authid"] = "unknown"
-	welcome, err = crAuth.Authenticate(sid, details, rp)
-	if err == nil {
-		t.Fatal("expected error from unknown authid")
-	}
-
-	// Test with known authid.
-	details["authid"] = "test"
-	nextCookie := &http.Cookie{Name: "nexus-wamp-cookie", Value: "a1b2c3"}
-	authDict := wamp.Dict{"nextcookie": nextCookie}
-	details["transport"] = wamp.Dict{"auth": authDict}
-
-	welcome, err = crAuth.Authenticate(sid, details, rp)
-	if err != nil {
-		t.Fatal("challenge failed: ", err.Error())
-	}
-	if welcome == nil {
-		t.Fatal("received nil welcome msg")
-	}
-	if welcome.MessageType() != wamp.WELCOME {
-		t.Fatal("expected WELCOME message, got: ", welcome.MessageType())
-	}
-	if s, _ := wamp.AsString(welcome.Details["authmethod"]); s != "wampcra" {
-		t.Fatal("invalid authmethod in welcome details")
-	}
-	if s, _ := wamp.AsString(welcome.Details["authrole"]); s != "user" {
-		t.Fatal("incorrect authrole in welcome details")
-	}
-
-	tks.secret = "bad"
-
-	// Test with bad ticket.
-	details["authid"] = "test"
-	welcome, err = crAuth.Authenticate(sid, details, rp)
-	if err == nil {
-		t.Fatal("expected error with bad key")
-	}
-
-	authDict["cookie"] = &http.Cookie{Name: "nexus-wamp-cookie", Value: "a1b2c3"}
-	authDict["nextcookie"] = &http.Cookie{Name: "nexus-wamp-cookie", Value: "xyz123"}
-	welcome, err = crAuth.Authenticate(sid, details, rp)
-	if err != nil {
-		t.Fatal("challenge failed: ", err.Error())
-	}
-}
-
-
-func cliRsp(p wamp.Peer) {
-	for msg := range p.Recv() {
-		ch, ok := msg.(*wamp.Challenge)
-		if !ok {
-			continue
-		}
-		signature, authDetails := clientAuthFunc(ch)
-		p.Send(&wamp.Authenticate{
-			Signature: signature,
-			Extra:     authDetails,
-		})
-	}
-}
-
-func clientAuthFunc(c *wamp.Challenge) (string, wamp.Dict) {
-	// If the client needed to lookup a user's key, this would require decoding
-	// the JSON-encoded ch string and getting the authid. For this example
-	// assume that client only operates as one user and knows the key to use.
-	var sig string
-	switch c.AuthMethod {
-	case "wampcra":
-		sig = crsign.RespondChallenge(goodSecret, c, nil)
-	}
-	return sig, wamp.Dict{}
 }
