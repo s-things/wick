@@ -31,13 +31,16 @@ var (
 	subscribeCommand = kingpin.Command("subscribe", "subscribe a topic.")
 	URLFlag = kingpin.Flag("url", "A WAMP URL to connect to, like ws://127.0.0.1:8080/ws or rs://localhost:1234").Required().Short('u').String()
 	realmFlag = kingpin.Flag("realm", "The realm to join").Required().Short('r').String()
+	privateKeyFlag = kingpin.Flag("private-key","Hex-encoded private key").String()
+	authidFlag = kingpin.Flag("authid","The authid to use, if authenticating").String()
+	authRoleFlag = kingpin.Flag("authrole", "The role to use, if authenticating").String()
 
 	topicArgSub  = subscribeCommand.Arg("topic", "topic name").Required().String()
 
 	publishCommand = kingpin.Command("publish", "publishing a topic.")
 	topicArgPub  = publishCommand.Arg("topic", "topic name").Required().String()
 	argumentsArgPub = publishCommand.Arg("args","give the arguments").Strings()
-	kwargsFlagPub   = publishCommand.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
+	kwArgsFlagPub   = publishCommand.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
 
 	registerCommand = kingpin.Command("register", "registering a procedure.")
 	topicArgReg  = registerCommand.Arg("procedure", "procedure name").Required().String()
@@ -50,7 +53,7 @@ var (
 	callCommand = kingpin.Command("call", "calling a procedure.")
 	topicArgCal  = callCommand.Arg("procedure", "procedure name").Required().String()
 	argumentsArgCal = callCommand.Arg("args","give the arguments").Strings()
-	kwargsFlagCal   = callCommand.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
+	kwArgsFlagCal   = callCommand.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
 )
 
 func main() {
@@ -58,7 +61,7 @@ func main() {
 		case "subscribe":
 			subscribe(*URLFlag, *realmFlag, *topicArgSub)
 		case "publish":
-			publish(*URLFlag, *realmFlag, *topicArgPub, *argumentsArgPub, *kwargsFlagPub)
+			publish(*URLFlag, *realmFlag, *topicArgPub, *argumentsArgPub, *kwArgsFlagPub)
 		case "register":
 			if *bashFlagReg != nil && *shellFlagReg == nil && *pythonFlagReg == nil && *execFlagReg == "" {
 				register(*URLFlag, *realmFlag, *topicArgReg, *bashFlagReg,"bash")
@@ -74,6 +77,6 @@ func main() {
 				fmt.Println("Please use one type for running script")
 			}
 		case "call":
-			call(*URLFlag, *realmFlag, *topicArgCal, *argumentsArgCal, *kwargsFlagCal)
+			call(*URLFlag, *realmFlag, *topicArgCal, *argumentsArgCal, *kwArgsFlagCal)
 	}
 }
