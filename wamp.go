@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
+	"github.com/gammazero/nexus/v3/wamp/crsign"
 	"log"
 	"os"
 	"os/exec"
@@ -35,28 +36,12 @@ import (
 	"strings"
 )
 
+var goodSecret string
+
 func subscribe(URLSub string, realmSub string, topicSub string,  authidFlag string, authSecretFlag string) {
 	logger := log.New(os.Stdout, "Subscriber> ", 0)
-	var cfg client.Config
-	if authidFlag != "" && authSecretFlag != "" {
-		cfg = client.Config{
-			Realm:  realmSub,
-			Logger: logger,
-			HelloDetails: wamp.Dict{
-				"authid": authidFlag,
-			},
-			AuthHandlers: map[string]client.AuthFunc{
-				"wampcra": clientAuthFunc,
-			},
-		}
-	} else {
-		cfg = client.Config{
-			Realm:  realmSub,
-			Logger: logger,
-		}
-	}
 
-	goodSecret = authSecretFlag
+	cfg := config(realmSub, authidFlag, authSecretFlag, logger)
 
 	// Connect subscriber session.
 	subscriber, err := client.ConnectNet(context.Background(), URLSub, cfg)
@@ -69,32 +54,7 @@ func subscribe(URLSub string, realmSub string, topicSub string,  authidFlag stri
 
 	// Define function to handle events received.
 	eventHandler := func(event *wamp.Event) {
-		if len(event.Arguments) != 0 {
-			fmt.Print("args : ")
-			for index, value := range event.Arguments {
-				if index != len(event.Arguments)-1 {
-					fmt.Print(value, ", ")
-				} else {
-					fmt.Println(value)
-				}
-			}
-		} else {
-			fmt.Println("args : {}")
-		}
-		i := 1
-		if len(event.ArgumentsKw) != 0 {
-			fmt.Print("kwargs : ")
-			for key, value := range event.ArgumentsKw {
-				if i == len(event.ArgumentsKw) {
-					fmt.Print(key, "=", value, "\n")
-				} else {
-					fmt.Print(key, "=", value, ", ")
-				}
-				i++
-			}
-		} else {
-			fmt.Println("kwargs : {}")
-		}
+		argsKWArgs(event.Arguments,event.ArgumentsKw)
 	}
 
 	// Subscribe to topic.
@@ -123,26 +83,8 @@ func subscribe(URLSub string, realmSub string, topicSub string,  authidFlag stri
 func publish(URLPub string, realmPub string, topicPub string, argsList []string, kwargsMap map[string]string,
 	authidFlag string, authSecretFlag string) {
 	logger := log.New(os.Stdout, "Publisher> ", 0)
-	var cfg client.Config
-	if authidFlag != "" && authSecretFlag != "" {
-		cfg = client.Config{
-			Realm:  realmPub,
-			Logger: logger,
-			HelloDetails: wamp.Dict{
-				"authid": authidFlag,
-			},
-			AuthHandlers: map[string]client.AuthFunc{
-				"wampcra": clientAuthFunc,
-			},
-		}
-	} else {
-		cfg = client.Config{
-			Realm:  realmPub,
-			Logger: logger,
-		}
-	}
-	goodSecret = authSecretFlag
 
+	cfg := config(realmPub, authidFlag, authSecretFlag, logger)
 
 	// Connect publisher session.
 	publisher, err := client.ConnectNet(context.Background(), URLPub, cfg)
@@ -151,17 +93,8 @@ func publish(URLPub string, realmPub string, topicPub string, argsList []string,
 	}
 	defer publisher.Close()
 
-	var arguments wamp.List
-	for _, value := range argsList {
-		arguments = append(arguments, value)
-	}
-
-	var keywordArguments wamp.Dict = make(map[string]interface{})
-	for key, value := range kwargsMap {
-		keywordArguments[key] = value
-	}
 	// Publish to topic.
-	err = publisher.Publish(topicPub, nil, arguments, keywordArguments)
+	err = publisher.Publish(topicPub, nil, listToWampList(argsList), dictToWampDict(kwargsMap))
 	if err != nil {
 		logger.Fatal("publish error:", err)
 	} else {
@@ -172,25 +105,8 @@ func publish(URLPub string, realmPub string, topicPub string, argsList []string,
 func register(URLReg string, realmReg string, procedureReg string, commands []string, shell string,
 	authidFlag string, authSecretFlag string) {
 	logger := log.New(os.Stdout, "Register> ", 0)
-	var cfg client.Config
-	if authidFlag != "" && authSecretFlag != "" {
-		cfg = client.Config{
-			Realm:  realmReg,
-			Logger: logger,
-			HelloDetails: wamp.Dict{
-				"authid": authidFlag,
-			},
-			AuthHandlers: map[string]client.AuthFunc{
-				"wampcra": clientAuthFunc,
-			},
-		}
-	} else {
-		cfg = client.Config{
-			Realm:  realmReg,
-			Logger: logger,
-		}
-	}
-	goodSecret = authSecretFlag
+
+	cfg := config(realmReg, authidFlag, authSecretFlag, logger)
 
 	register, err := client.ConnectNet(context.Background(), URLReg, cfg)
 	logger.Println("Connected to ", URLReg)
@@ -201,32 +117,8 @@ func register(URLReg string, realmReg string, procedureReg string, commands []st
 	defer register.Close()
 
 	eventHandler := func(ctx context.Context, inv *wamp.Invocation) client.InvokeResult {
-		if len(inv.Arguments) != 0 {
-			fmt.Print("args : ")
-			for index, value := range inv.Arguments {
-				if index != len(inv.Arguments)-1 {
-					fmt.Print(value, ", ")
-				} else {
-					fmt.Println(value)
-				}
-			}
-		} else {
-			fmt.Println("args : {}")
-		}
-		i := 1
-		if len(inv.ArgumentsKw) != 0 {
-			fmt.Print("kwargs : ")
-			for key, value := range inv.ArgumentsKw {
-				if i == len(inv.ArgumentsKw) {
-					fmt.Print(key, "=", value, "\n")
-				} else {
-					fmt.Print(key, "=", value, ", ")
-				}
-				i++
-			}
-		} else {
-			fmt.Println("kwargs : {}")
-		}
+
+		argsKWArgs(inv.Arguments,inv.ArgumentsKw)
 
 		if commands != nil {
 			var command string
@@ -284,26 +176,7 @@ func call(URLCal string, realmCal string, procedureCal string, argsList []string
 	authidFlag string, authSecretFlag string) {
 	logger := log.New(os.Stderr, "Caller> ", 0)
 
-	var cfg client.Config
-	if authidFlag != "" && authSecretFlag != "" {
-		cfg = client.Config{
-			Realm:  realmCal,
-			Logger: logger,
-			HelloDetails: wamp.Dict{
-				"authid": authidFlag,
-			},
-			AuthHandlers: map[string]client.AuthFunc{
-				"wampcra": clientAuthFunc,
-			},
-		}
-	} else {
-		cfg = client.Config{
-			Realm:  realmCal,
-			Logger: logger,
-		}
-	}
-
-	goodSecret = authSecretFlag
+	cfg := config(realmCal, authidFlag, authSecretFlag, logger)
 
 	// Connect caller client
 	caller, err := client.ConnectNet(context.Background(), URLCal, cfg)
@@ -314,21 +187,86 @@ func call(URLCal string, realmCal string, procedureCal string, argsList []string
 
 	ctx := context.Background()
 
-	var arguments wamp.List
-	for _, value := range argsList {
-		arguments = append(arguments, value)
-	}
-
-	var keywordArguments wamp.Dict = make(map[string]interface{})
-	for key, value := range kwargsMap {
-		keywordArguments[key] = value
-	}
-
-	result, err := caller.Call(ctx, procedureCal, nil, arguments, keywordArguments, nil)
+	result, err := caller.Call(ctx, procedureCal, nil, listToWampList(argsList), dictToWampDict(kwargsMap), nil)
 	if err != nil {
 		logger.Println("Failed to call ", err)
 	} else if result != nil {
 		fmt.Println(result.Arguments[0])
+	}
+}
+
+func clientAuthFunc(c *wamp.Challenge) (string, wamp.Dict) {
+	sig := crsign.RespondChallenge(goodSecret, c, nil)
+	return sig, wamp.Dict{}
+}
+
+func listToWampList(argsList []string) wamp.List {
+	var arguments wamp.List
+	for _, value := range argsList {
+		arguments = append(arguments, value)
+	}
+	return arguments
+}
+
+func dictToWampDict(kwargsMap map[string]string) wamp.Dict {
+	var keywordArguments wamp.Dict = make(map[string]interface{})
+	for key, value := range kwargsMap {
+		keywordArguments[key] = value
+	}
+	return keywordArguments
+}
+
+func config(realm string, authidFlag string, authSecretFlag string, logger *log.Logger) client.Config{
+	var cfg client.Config
+	if authidFlag != "" && authSecretFlag != "" {
+		cfg = client.Config{
+			Realm:  realm,
+			Logger: logger,
+			HelloDetails: wamp.Dict{
+				"authid": authidFlag,
+			},
+			AuthHandlers: map[string]client.AuthFunc{
+				"wampcra": clientAuthFunc,
+			},
+		}
+	} else {
+		cfg = client.Config{
+			Realm:  realm,
+			Logger: logger,
+		}
+	}
+
+	goodSecret = authSecretFlag
+
+	return cfg
+}
+
+func argsKWArgs(args wamp.List, kwArgs wamp.Dict)  {
+	if len(args) != 0 {
+		fmt.Print("args : ")
+		for index, value := range args {
+			if index != len(args)-1 {
+				fmt.Print(value, ", ")
+			} else {
+				fmt.Println(value)
+			}
+		}
+	} else {
+		fmt.Println("args : {}")
+	}
+	i := 1
+	if len(kwArgs) != 0 {
+		fmt.Print("kwargs : ")
+		for key, value := range kwArgs {
+			if i == len(kwArgs) {
+				fmt.Print(key, "=", value, "\n")
+			} else {
+				fmt.Print(key, "=", value, ", ")
+			}
+			i++
+		}
+	} else {
+		fmt.Println("kwargs : {}")
 	}
 }
 
