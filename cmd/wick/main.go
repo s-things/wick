@@ -84,7 +84,7 @@ func main() {
 		serializerToUse = serialize.JSON
 	}
 
-	logger := log.New(os.Stdout, "wick> ", 0)
+	logger := log.New(os.Stdout, "", 0)
 	var session *client.Client
 
 	switch *authMethod {
