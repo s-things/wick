@@ -33,29 +33,33 @@ import (
 )
 
 var (
-	url            = kingpin.Flag("url", "WAMP URL to connect to").
+	url = kingpin.Flag("url", "WAMP URL to connect to").
 		Default("ws://localhost:8080/ws").Envar("WICK_URL").String()
-	realm      = kingpin.Flag("realm", "The WAMP realm to join").Default("realm1").Envar("WICK_REALM").String()
-	authMethod = kingpin.Flag("authmethod","The authentication method to use").Envar("WICK_AUTHMETHOD").
-		Default("anonymous").Enum("anonymous", "ticket", "wampcra", "cryptosign")
-	authid         = kingpin.Flag("authid","The authid to use, if authenticating").Envar("WICK_AUTHID").String()
-	authrole       = kingpin.Flag("authrole","The authrole to use, if authenticating").Envar("WICK_AUTHROLE").String()
-	secret         = kingpin.Flag("secret", "The secret to use in Challenge-Response Auth.").
-		Envar("WICK_CRA_SECRET").String()
-	privateKey     = kingpin.Flag("private-key", "The ed25519 private key hex for cryptosign").
-		Envar("WICK_CRYPTOSIGN_PRIVATE_KEY").String()
-	publicKey      = kingpin.Flag("public-key", "The ed25519 public key hex for cryptosign").
-		Envar("WICK_CRYPTOSIGN_PUBLIC_KEY").String()
-	ticket         = kingpin.Flag("ticket", "The ticket when when ticket authentication").Envar("WICK_TICKET").String()
-	serializer     = kingpin.Flag("serializer", "The serializer to use").Envar("WICK_SERIALIZER").Default("json").
-		Enum("json", "msgpack", "cbor")
+	realm      = kingpin.Flag("realm", "The WAMP realm to join").Default("realm1").
+		Envar("WICK_REALM").String()
+	authMethod = kingpin.Flag("authmethod", "The authentication method to use").Envar("WICK_AUTHMETHOD").
+			Default("anonymous").Enum("anonymous", "ticket", "wampcra", "cryptosign")
+	authid   = kingpin.Flag("authid", "The authid to use, if authenticating").Envar("WICK_AUTHID").
+		String()
+	authrole = kingpin.Flag("authrole", "The authrole to use, if authenticating").
+		Envar("WICK_AUTHROLE").String()
+	secret   = kingpin.Flag("secret", "The secret to use in Challenge-Response Auth.").
+			Envar("WICK_SECRET").String()
+	privateKey = kingpin.Flag("private-key", "The ed25519 private key hex for cryptosign").
+			Envar("WICK_PRIVATE_KEY").String()
+	publicKey = kingpin.Flag("public-key", "The ed25519 public key hex for cryptosign").
+			Envar("WICK_PUBLIC_KEY").String()
+	ticket     = kingpin.Flag("ticket", "The ticket when using ticket authentication").
+		Envar("WICK_TICKET").String()
+	serializer = kingpin.Flag("serializer", "The serializer to use").Envar("WICK_SERIALIZER").
+		Default("json").Enum("json", "msgpack", "cbor")
 
 	subscribe      = kingpin.Command("subscribe", "subscribe a topic.")
 	subscribeTopic = subscribe.Arg("topic", "Topic to subscribe to").Required().String()
 
 	publish            = kingpin.Command("publish", "Publish to a topic.")
 	publishTopic       = publish.Arg("topic", "topic name").Required().String()
-	publishArgs        = publish.Arg("args","give the arguments").Strings()
+	publishArgs        = publish.Arg("args", "give the arguments").Strings()
 	publishKeywordArgs = publish.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
 
 	register          = kingpin.Command("register", "Register a procedure.")
@@ -64,7 +68,7 @@ var (
 
 	call            = kingpin.Command("call", "Call a procedure.")
 	callProcedure   = call.Arg("procedure", "Procedure to call").Required().String()
-	callArgs        = call.Arg("args","give the arguments").Strings()
+	callArgs        = call.Arg("args", "give the arguments").Strings()
 	callKeywordArgs = call.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
 )
 
@@ -75,13 +79,10 @@ func main() {
 
 	switch *serializer {
 	case "json":
-		serializerToUse = serialize.JSON
 	case "msgpack":
 		serializerToUse = serialize.MSGPACK
 	case "cbor":
 		serializerToUse = serialize.CBOR
-	default:
-		serializerToUse = serialize.JSON
 	}
 
 	logger := log.New(os.Stdout, "", 0)

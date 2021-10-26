@@ -56,6 +56,7 @@ export WICK_REALM=something
 wick call foo.bar
 ```
 
+
 ## How to install
 On Linux use snapd
 ```shell

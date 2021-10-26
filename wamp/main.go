@@ -299,6 +299,10 @@ func Call(session *client.Client, logger *log.Logger, procedure string, args []s
 
 func listToWampList(args []string) wamp.List {
 	var arguments wamp.List
+
+	if args == nil{
+		return append(arguments, "")
+	}
 	for _, value := range args {
 		arguments = append(arguments, value)
 	}
@@ -313,10 +317,13 @@ func dictToWampDict(kwargs map[string]string) wamp.Dict {
 	return keywordArguments
 }
 
+
 func argsKWArgs(args wamp.List, kwArgs wamp.Dict)  {
 	if len(args) != 0 {
-		fmt.Print("args : ")
 		for index, value := range args {
+			if len(args) == 1 && value != ""{
+				fmt.Print("args : ")
+			}
 			if index != len(args)-1 {
 				fmt.Print(value, ", ")
 			} else {
@@ -324,7 +331,7 @@ func argsKWArgs(args wamp.List, kwArgs wamp.Dict)  {
 			}
 		}
 	} else {
-		fmt.Println("args : {}")
+		fmt.Println()
 	}
 	i := 1
 	if len(kwArgs) != 0 {
@@ -338,7 +345,7 @@ func argsKWArgs(args wamp.List, kwArgs wamp.Dict)  {
 			i++
 		}
 	} else {
-		fmt.Println("kwargs : {}")
+		fmt.Println("")
 	}
 }
 
