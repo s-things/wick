@@ -48,7 +48,7 @@ func connect(url string, cfg client.Config, logger *log.Logger) *client.Client {
 	if err != nil {
 		logger.Fatal(err)
 	} else {
-		logger.Println("Connected to ", url)
+		//logger.Println("Connected to ", url)
 	}
 
 	return session
@@ -298,7 +298,6 @@ func Call(session *client.Client, logger *log.Logger, procedure string, args []s
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		fmt.Println(string(jsonString))
 	}
 }
@@ -327,33 +326,33 @@ func dictToWampDict(kwargs map[string]string) wamp.Dict {
 
 
 func argsKWArgs(args wamp.List, kwArgs wamp.Dict)  {
+	fmt.Println("\nReceived Event:")
 	if len(args) != 0 {
 		for index, value := range args {
-			if len(args) == 1 && value != ""{
-				fmt.Print("args : ")
+			if index == 0{
+				fmt.Print("args: ")
+				fmt.Print("[ ")
 			}
 			if index != len(args)-1 {
 				fmt.Print(value, ", ")
 			} else {
-				fmt.Println(value)
+				fmt.Print(value)
+				fmt.Print(" ]\n")
 			}
 		}
 	} else {
 		fmt.Println()
 	}
-	i := 1
+
 	if len(kwArgs) != 0 {
-		fmt.Print("kwargs : ")
-		for key, value := range kwArgs {
-			if i == len(kwArgs) {
-				fmt.Print(key, "=", value, "\n")
-			} else {
-				fmt.Print(key, "=", value, ", ")
-			}
-			i++
+		fmt.Println("kwargs:")
+		jsonString, err := json.MarshalIndent(kwArgs, "", "    ")
+		if err != nil {
+			log.Fatal(err)
 		}
+		fmt.Println(string(jsonString))
 	} else {
-		fmt.Println("")
+		fmt.Println()
 	}
 }
 
