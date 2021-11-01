@@ -36,6 +36,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"strings"
 
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/transport/serialize"
@@ -44,11 +45,17 @@ import (
 )
 
 func connect(url string, cfg client.Config, logger *log.Logger) *client.Client {
+	baseUrl := url
+  if strings.HasPrefix(url, "rs") {
+		url = "tcp" + strings.TrimPrefix(url, "rs")
+	} else if strings.HasPrefix(url, "rss") {
+		url = "tcp" + strings.TrimPrefix(url, "rss")
+  }
 	session, err := client.ConnectNet(context.Background(), url, cfg)
 	if err != nil {
 		logger.Fatal(err)
 	} else {
-		//logger.Println("Connected to ", url)
+		logger.Println("Connected to ", baseUrl)
 	}
 
 	return session
@@ -67,9 +74,9 @@ func ConnectAnonymous(url string, realm string, serializer serialize.Serializati
 	}
 
 	cfg := client.Config{
-		Realm:  realm,
-		Logger: logger,
-		HelloDetails: helloDict,
+		Realm:         realm,
+		Logger:        logger,
+		HelloDetails:  helloDict,
 		Serialization: serializer,
 	}
 
@@ -89,11 +96,11 @@ func ConnectTicket(url string, realm string, serializer serialize.Serialization,
 	}
 
 	cfg := client.Config{
-		Realm:  realm,
-		Logger: logger,
+		Realm:        realm,
+		Logger:       logger,
 		HelloDetails: helloDict,
 		AuthHandlers: map[string]client.AuthFunc{
-			"ticket": func (c *wamp.Challenge) (string, wamp.Dict) {
+			"ticket": func(c *wamp.Challenge) (string, wamp.Dict) {
 				return ticket, wamp.Dict{}
 			},
 		},
@@ -116,11 +123,11 @@ func ConnectCRA(url string, realm string, serializer serialize.Serialization, au
 	}
 
 	cfg := client.Config{
-		Realm:  realm,
-		Logger: logger,
+		Realm:        realm,
+		Logger:       logger,
 		HelloDetails: helloDict,
 		AuthHandlers: map[string]client.AuthFunc{
-			"wampcra": func (c *wamp.Challenge) (string, wamp.Dict) {
+			"wampcra": func(c *wamp.Challenge) (string, wamp.Dict) {
 				ch, _ := wamp.AsString(c.Extra["challenge"])
 				// If the client needed to lookup a user's key, this would require decoding
 				// the JSON-encoded challenge string and getting the authid.  For this
@@ -186,11 +193,11 @@ func ConnectCryptoSign(url string, realm string, serializer serialize.Serializat
 	helloDict["authextra"] = wamp.Dict{"pubkey": publicKey}
 
 	cfg := client.Config{
-		Realm:  realm,
-		Logger: logger,
+		Realm:        realm,
+		Logger:       logger,
 		HelloDetails: helloDict,
 		AuthHandlers: map[string]client.AuthFunc{
-			"cryptosign": func (c *wamp.Challenge) (string, wamp.Dict) {
+			"cryptosign": func(c *wamp.Challenge) (string, wamp.Dict) {
 				challengeHex, _ := wamp.AsString(c.Extra["challenge"])
 				challengeBytes, _ := hex.DecodeString(challengeHex)
 
@@ -249,7 +256,7 @@ func Publish(session *client.Client, logger *log.Logger, topic string, args []st
 func Register(session *client.Client, logger *log.Logger, procedure string, command string) {
 	eventHandler := func(ctx context.Context, inv *wamp.Invocation) client.InvokeResult {
 
-		argsKWArgs(inv.Arguments,inv.ArgumentsKw)
+		argsKWArgs(inv.Arguments, inv.ArgumentsKw)
 
 		if command != "" {
 			err, out, _ := shellOut(command)
@@ -263,8 +270,7 @@ func Register(session *client.Client, logger *log.Logger, procedure string, comm
 		return client.InvokeResult{Args: wamp.List{""}}
 	}
 
-	if err := session.Register(procedure, eventHandler, nil);
-		err != nil {
+	if err := session.Register(procedure, eventHandler, nil); err != nil {
 		logger.Fatal("Failed to register procedure:", err)
 	} else {
 		logger.Println("Registered procedure", procedure, "with router")
@@ -324,15 +330,12 @@ func dictToWampDict(kwargs map[string]string) wamp.Dict {
 	return keywordArguments
 }
 
-
-func argsKWArgs(args wamp.List, kwArgs wamp.Dict)  {
-	fmt.Println("\nReceived Event:")
+func argsKWArgs(args wamp.List, kwArgs wamp.Dict) {
 	if len(args) != 0 {
 		for index, value := range args {
-			if index == 0{
-				fmt.Print("args: ")
-				fmt.Print("[ ")
-			}
+			if len(args) == 1 && value != "" {
+				fmt.Print("args : ")
+      }
 			if index != len(args)-1 {
 				fmt.Print(value, ", ")
 			} else {

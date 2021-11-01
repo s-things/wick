@@ -1,90 +1,150 @@
 {
-    "$schema": "https://raw.githubusercontent.com/crossbario/crossbar/master/crossbar.json",
-    "version": 2,
-    "controller": {
-    },
-    "workers": [
+  "$schema": "https://raw.githubusercontent.com/crossbario/crossbar/master/crossbar.json",
+  "version": 2,
+  "controller": {
+  },
+  "workers": [
+    {
+      "type": "router",
+      "realms": [
         {
-            "type": "router",
-            "realms": [
+          "name": "realm1",
+          "roles": [
+            {
+              "name": "anonymous",
+              "permissions": [
                 {
-                    "name": "realm1",
-                    "roles": [
-                        {
-                            "name": "anonymous",
-                            "permissions": [
-                                {
-                                    "uri": "",
-                                    "match": "prefix",
-                                    "allow": {
-                                        "call": true,
-                                        "register": true,
-                                        "publish": true,
-                                        "subscribe": true
-                                    },
-                                    "disclose": {
-                                        "caller": false,
-                                        "publisher": false
-                                    },
-                                    "cache": true
-                                }
-                            ]
-                        }
-                    ]
+                  "uri": "",
+                  "match": "prefix",
+                  "allow": {
+                    "call": true,
+                    "register": true,
+                    "publish": true,
+                    "subscribe": true
+                  },
+                  "disclose": {
+                    "caller": false,
+                    "publisher": false
+                  },
+                  "cache": true
                 }
-            ],
-            "transports": [
-                {
-                    "type": "websocket",
-                    "endpoint": {
-                        "type": "tcp",
-                        "port": 8080,
-                        "backlog": 1024
-                    },
-                    "serializers": [
-                        "cbor", "msgpack", "json"
-                    ],
-                    "auth": {
-                        "ticket": {
-                            "type": "static",
-                            "principals": {
-                                "john": {
-                                    "ticket": "williamsburg",
-                                    "role": "anonymous"
-                                }
-                            }
-                        },
-                        "wampcra": {
-                           "type": "static",
-                           "users": {
-                              "john": {
-                                 "secret": "williamsburg",
-                                 "role": "anonymous"
-                              },
-                              "wick": {
-                                 "secret": "Be2qU5KofgFo5/DwUVLQfI1pV19YMhdwbD3TxmuGI8U=",
-                                 "role": "anonymous",
-                                 "salt": "salt123",
-                                 "iterations": 1000,
-                                 "keylen": 32
-                              }
-                           }
-                        },
-                        "cryptosign": {
-                            "type": "static",
-                            "principals": {
-                               "john@wick.com": {
-                                  "realm": "realm1",
-                                  "role": "anonymous",
-                                  "authorized_keys": [
-                                     "22509ce613c8d604305a8134819f8ffb7ed601b3d0d94253f66fc5d81c94e714"
-                                  ]
-                               }
-                            }
-                        }
-                    }
-                }
-            ]
+              ]
+            }
+          ]
         }
-    ]
+      ],
+      "transports": [
+        {
+          "type": "websocket",
+          "endpoint": {
+            "type": "tcp",
+            "port": 8080,
+            "backlog": 1024
+          },
+          "serializers": [
+            "cbor",
+            "msgpack",
+            "json"
+          ],
+          "auth": {
+            "ticket": {
+              "type": "static",
+              "principals": {
+                "john": {
+                  "ticket": "williamsburg",
+                  "role": "anonymous"
+                }
+              }
+            },
+            "wampcra": {
+              "type": "static",
+              "users": {
+                "john": {
+                  "secret": "williamsburg",
+                  "role": "anonymous"
+                },
+                "wick": {
+                  "secret": "Be2qU5KofgFo5/DwUVLQfI1pV19YMhdwbD3TxmuGI8U=",
+                  "role": "anonymous",
+                  "salt": "salt123",
+                  "iterations": 1000,
+                  "keylen": 32
+                }
+              }
+            },
+            "cryptosign": {
+              "type": "static",
+              "principals": {
+                "john@wick.com": {
+                  "realm": "realm1",
+                  "role": "anonymous",
+                  "authorized_keys": [
+                    "22509ce613c8d604305a8134819f8ffb7ed601b3d0d94253f66fc5d81c94e714"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "rawsocket",
+          "endpoint": {
+            "type": "tcp",
+            "port": 8081
+          },
+          "serializers": [
+            "cbor",
+            "msgpack",
+            "json"
+          ],
+          "auth": {
+            "ticket": {
+              "type": "static",
+              "principals": {
+                "john": {
+                  "ticket": "williamsburg",
+                  "role": "anonymous"
+                }
+              }
+            },
+            "wampcra": {
+              "type": "static",
+              "users": {
+                "john": {
+                  "secret": "williamsburg",
+                  "role": "anonymous"
+                },
+                "wick": {
+                  "secret": "Be2qU5KofgFo5/DwUVLQfI1pV19YMhdwbD3TxmuGI8U=",
+                  "role": "anonymous",
+                  "salt": "salt123",
+                  "iterations": 1000,
+                  "keylen": 32
+                }
+              }
+            },
+            "cryptosign": {
+              "type": "static",
+              "principals": {
+                "john@wick.com": {
+                  "realm": "realm1",
+                  "role": "anonymous",
+                  "authorized_keys": [
+                    "22509ce613c8d604305a8134819f8ffb7ed601b3d0d94253f66fc5d81c94e714"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "rawsocket",
+          "endpoint": {
+            "type": "unix",
+            "path": "crossbar.sock"
+          }
+        }
+      ]
+    }
+  ]
 }
