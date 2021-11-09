@@ -56,6 +56,21 @@ export WICK_REALM=something
 wick call foo.bar
 ```
 
+### Supported Environment Variables
+These are self-explanatory.
+```shell
+WICK_URL
+WICK_REALM
+WICK_AUTHMETHOD
+WICK_AUTHID
+WICK_AUTHROLE
+WICK_SECRET
+WICK_PUBLIC_KEY
+WICK_PRIVATE_KEY
+WICK_TICKET
+WICK_SERIALIZER
+```
+
 
 ## How to install
 On Linux use snapd
