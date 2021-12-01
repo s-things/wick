@@ -339,17 +339,6 @@ func argsKWArgs(args wamp.List, kwArgs wamp.Dict) {
 			log.Fatal(err)
 		}
 		fmt.Println(string(jsonString))
-		//for index, value := range args {
-		//	if len(args) == 1 && value != "" {
-		//		fmt.Print("args: ")
-		//	}
-		//	if index != len(args)-1 {
-		//		fmt.Print(value, ", ")
-		//	} else {
-		//		fmt.Print(value)
-		//		fmt.Print(" \n")
-		//	}
-		//}
 	}
 
 	if len(kwArgs) != 0 {
@@ -359,6 +348,11 @@ func argsKWArgs(args wamp.List, kwArgs wamp.Dict) {
 			log.Fatal(err)
 		}
 		fmt.Println(string(jsonString))
+	}
+
+	if len(args) == 0 && len(kwArgs) == 0 {
+		fmt.Println("args: []")
+		fmt.Println("kwargs: {}")
 	}
 }
 
