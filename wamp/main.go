@@ -314,14 +314,16 @@ func Call(session *client.Client, logger *log.Logger, procedure string, args []s
 
 func listToWampList(args []string) wamp.List {
 	var arguments wamp.List
-	var mapJson map[string]interface{}
-	var mapList []map[string]interface{}
 
 	if args == nil {
 		return wamp.List{}
 	}
 
 	for _, value := range args {
+
+		var mapJson map[string]interface{}
+		var mapList []map[string]interface{}
+
 		if number, errNumber := strconv.Atoi(value); errNumber == nil {
 			arguments = append(arguments, number)
 		} else if float, errFloat := strconv.ParseFloat(value, 64); errFloat == nil {
@@ -342,10 +344,12 @@ func listToWampList(args []string) wamp.List {
 
 func dictToWampDict(kwargs map[string]string) wamp.Dict {
 	var keywordArguments wamp.Dict = make(map[string]interface{})
-	var mapJson map[string]interface{}
-	var mapList []map[string]interface{}
 
 	for key, value := range kwargs {
+
+		var mapJson map[string]interface{}
+		var mapList []map[string]interface{}
+
 		if number, errNumber := strconv.Atoi(value); errNumber == nil {
 			keywordArguments[key] = number
 		} else if float, errFloat := strconv.ParseFloat(value, 64); errFloat == nil {
