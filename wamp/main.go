@@ -36,6 +36,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"strconv"
 	"strings"
 
 	"github.com/gammazero/nexus/v3/client"
@@ -313,13 +314,27 @@ func Call(session *client.Client, logger *log.Logger, procedure string, args []s
 
 func listToWampList(args []string) wamp.List {
 	var arguments wamp.List
+	var mapJson map[string]interface{}
+	var mapList []map[string]interface{}
 
 	if args == nil {
 		return wamp.List{}
 	}
 
 	for _, value := range args {
-		arguments = append(arguments, value)
+		if number, errNumber := strconv.Atoi(value); errNumber == nil {
+			arguments = append(arguments, number)
+		} else if float, errFloat := strconv.ParseFloat(value, 64); errFloat == nil {
+			arguments = append(arguments, float)
+		} else if boolean, errBoolean := strconv.ParseBool(value); errBoolean == nil {
+			arguments = append(arguments, boolean)
+		} else if errJson := json.Unmarshal([]byte(value), &mapJson); errJson == nil {
+			arguments = append(arguments, mapJson)
+		} else if errList := json.Unmarshal([]byte(value), &mapList); errList == nil {
+			arguments = append(arguments, mapList)
+		} else {
+			arguments = append(arguments, value)
+		}
 	}
 
 	return arguments
@@ -327,8 +342,23 @@ func listToWampList(args []string) wamp.List {
 
 func dictToWampDict(kwargs map[string]string) wamp.Dict {
 	var keywordArguments wamp.Dict = make(map[string]interface{})
+	var mapJson map[string]interface{}
+	var mapList []map[string]interface{}
+
 	for key, value := range kwargs {
-		keywordArguments[key] = value
+		if number, errNumber := strconv.Atoi(value); errNumber == nil {
+			keywordArguments[key] = number
+		} else if float, errFloat := strconv.ParseFloat(value, 64); errFloat == nil {
+			keywordArguments[key] = float
+		} else if boolean, errBoolean := strconv.ParseBool(value); errBoolean == nil {
+			keywordArguments[key] = boolean
+		} else if errJson := json.Unmarshal([]byte(value), &mapJson); errJson == nil {
+			keywordArguments[key] = mapJson
+		} else if errList := json.Unmarshal([]byte(value), &mapList); errList == nil {
+			keywordArguments[key] = mapList
+		} else {
+			keywordArguments[key] = value
+		}
 	}
 	return keywordArguments
 }
