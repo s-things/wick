@@ -86,26 +86,18 @@ func main() {
 	logger := log.New(os.Stdout, "", 0)
 
 	if *privateKey != "" && *ticket != "" {
-		logger.Fatal("Select only one of private key, ticket and secret", "")
-	}
-
-	if *ticket != "" && *secret != "" {
-		logger.Fatal("Select only one of private key, ticket and secret", "")
-	}
-
-	if *privateKey != "" && *secret != "" {
-		logger.Fatal("Select only one of private key, ticket and secret", "")
+		logger.Fatal("Select only one of private key, ticket and secret")
+	} else if *ticket != "" && *secret != "" {
+		logger.Fatal("Select only one of private key, ticket and secret")
+	} else if *privateKey != "" && *secret != "" {
+		logger.Fatal("Select only one of private key, ticket and secret")
 	}
 
 	if *privateKey != "" {
 		*authMethod = "cryptosign"
-	}
-
-	if *ticket != "" {
+	} else if *ticket != "" {
 		*authMethod = "ticket"
-	}
-
-	if *secret != "" {
+	} else if *secret != "" {
 		*authMethod = "wampcra"
 	}
 
