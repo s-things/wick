@@ -86,11 +86,11 @@ func main() {
 	logger := log.New(os.Stdout, "", 0)
 
 	if *privateKey != "" && *ticket != "" {
-		logger.Fatal("Select only one of private key, ticket and secret")
+		logger.Fatal("Select only one of private key, ticket or secret")
 	} else if *ticket != "" && *secret != "" {
-		logger.Fatal("Select only one of private key, ticket and secret")
+		logger.Fatal("Select only one of private key, ticket or secret")
 	} else if *privateKey != "" && *secret != "" {
-		logger.Fatal("Select only one of private key, ticket and secret")
+		logger.Fatal("Select only one of private key, ticket or secret")
 	}
 
 	if *privateKey != "" {
