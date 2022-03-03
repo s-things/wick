@@ -302,8 +302,8 @@ func Call(session *client.Client, logger *log.Logger, procedure string, args []s
 
 	result, err := session.Call(ctx, procedure, nil, listToWampList(args), dictToWampDict(kwargs), nil)
 	if err != nil {
-		logger.Println("Failed to call ", err)
-	} else if result != nil {
+		logger.Println(err)
+	} else if result != nil && len(result.Arguments) > 0 {
 		jsonString, err := json.MarshalIndent(result.Arguments[0], "", "    ")
 		if err != nil {
 			log.Fatal(err)
