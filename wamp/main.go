@@ -30,9 +30,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ed25519"
 	"golang.org/x/crypto/pbkdf2"
-	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -226,7 +226,7 @@ func Subscribe(session *client.Client, logger *log.Logger, topic string) {
 	if err != nil {
 		logger.Fatal("subscribe error:", err)
 	} else {
-		fmt.Printf("Subscribed to topic '%s'\n", topic)
+		logger.Printf("Subscribed to topic '%s'\n", topic)
 	}
 	// Wait for CTRL-c or client close while handling events.
 	sigChan := make(chan os.Signal, 1)
@@ -252,7 +252,7 @@ func Publish(session *client.Client, logger *log.Logger, topic string, args []st
 	if err != nil {
 		logger.Fatal("Publish error:", err)
 	} else {
-		fmt.Printf("Published to topic '%s'\n", topic)
+		logger.Printf("Published to topic '%s'\n", topic)
 	}
 }
 
@@ -264,7 +264,7 @@ func Register(session *client.Client, logger *log.Logger, procedure string, comm
 		if command != "" {
 			err, out, _ := shellOut(command)
 			if err != nil {
-				log.Println("error: ", err)
+				logger.Println("error: ", err)
 			}
 
 			return client.InvokeResult{Args: wamp.List{out}}
@@ -276,7 +276,7 @@ func Register(session *client.Client, logger *log.Logger, procedure string, comm
 	if err := session.Register(procedure, eventHandler, nil); err != nil {
 		logger.Fatal("Failed to register procedure:", err)
 	} else {
-		fmt.Printf("Registered procedure '%s'\n", procedure)
+		logger.Printf("Registered procedure '%s'\n", procedure)
 	}
 
 	// Wait for CTRL-c or client close while handling remote procedure calls.
@@ -306,7 +306,7 @@ func Call(session *client.Client, logger *log.Logger, procedure string, args []s
 	} else if result != nil && len(result.Arguments) > 0 {
 		jsonString, err := json.MarshalIndent(result.Arguments[0], "", "    ")
 		if err != nil {
-			log.Fatal(err)
+			logger.Fatal(err)
 		}
 		fmt.Println(string(jsonString))
 	}

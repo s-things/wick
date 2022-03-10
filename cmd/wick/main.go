@@ -25,9 +25,8 @@ package main
 import (
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/transport/serialize"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"log"
-	"os"
 
 	"github.com/codebasepk/wick/wamp"
 )
@@ -83,7 +82,7 @@ func main() {
 		serializerToUse = serialize.CBOR
 	}
 
-	logger := log.New(os.Stdout, "", 0)
+	logger := log.New()
 
 	if *privateKey != "" && *ticket != "" {
 		logger.Fatal("Provide only one of private key, ticket or secret")
@@ -106,34 +105,28 @@ func main() {
 	switch *authMethod {
 	case "anonymous":
 		if *privateKey != "" {
-			println("Private key not needed for anonymous auth")
-			os.Exit(1)
+			logger.Fatal("Private key not needed for anonymous auth")
 		}
 		if *ticket != "" {
-			println("ticket not needed for anonymous auth")
-			os.Exit(1)
+			logger.Fatal("ticket not needed for anonymous auth")
 		}
 		if *secret != "" {
-			println("secret not needed for anonymous auth")
-			os.Exit(1)
+			logger.Fatal("secret not needed for anonymous auth")
 		}
 		session = wamp.ConnectAnonymous(*url, *realm, serializerToUse, *authid, *authrole, logger)
 	case "ticket":
 		if *ticket == "" {
-			println("Must provide ticket when authMethod is ticket")
-			os.Exit(1)
+			logger.Fatal("Must provide ticket when authMethod is ticket")
 		}
 		session = wamp.ConnectTicket(*url, *realm, serializerToUse, *authid, *authrole, *ticket, logger)
 	case "wampcra":
 		if *secret == "" {
-			println("Must provide secret when authMethod is wampcra")
-			os.Exit(1)
+			logger.Fatal("Must provide secret when authMethod is wampcra")
 		}
 		session = wamp.ConnectCRA(*url, *realm, serializerToUse, *authid, *authrole, *secret, logger)
 	case "cryptosign":
 		if *privateKey == "" {
-			println("Must provide private key when authMethod is cryptosign")
-			os.Exit(1)
+			logger.Fatal("Must provide private key when authMethod is cryptosign")
 		}
 		session = wamp.ConnectCryptoSign(*url, *realm, serializerToUse, *authid, *authrole, *privateKey, logger)
 	}
