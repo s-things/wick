@@ -69,7 +69,10 @@ var (
 	callKeywordArgs = call.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
 )
 
+const versionString = "0.3.0"
+
 func main() {
+	kingpin.Version(versionString).VersionFlag.Short('v')
 	cmd := kingpin.Parse()
 
 	serializerToUse := serialize.JSON
