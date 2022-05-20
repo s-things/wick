@@ -41,6 +41,7 @@ import (
 	"os/signal"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/transport/serialize"
@@ -269,7 +270,7 @@ func Publish(session *client.Client, topic string, args []string, kwargs map[str
 	}
 }
 
-func Register(session *client.Client, procedure string, command string) {
+func Register(session *client.Client, procedure string, command string, delay int) {
 	eventHandler := func(ctx context.Context, inv *wamp.Invocation) client.InvokeResult {
 
 		argsKWArgs(inv.Arguments, inv.ArgumentsKw, nil)
@@ -284,6 +285,11 @@ func Register(session *client.Client, procedure string, command string) {
 		}
 
 		return client.InvokeResult{Args: wamp.List{""}}
+	}
+
+	if delay > 0 {
+		fmt.Printf("procedure will be registered after %d seconds.\n", delay)
+		time.Sleep(time.Duration(delay) * time.Second)
 	}
 
 	if err := session.Register(procedure, eventHandler, nil); err != nil {

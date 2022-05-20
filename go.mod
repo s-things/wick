@@ -8,7 +8,7 @@ require (
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
 
-require golang.org/x/sys v0.0.0-20191026070338-33540a1f6037 // indirect
+require golang.org/x/sys v0.0.0-20220519141025-dcacdad47464 // indirect
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect

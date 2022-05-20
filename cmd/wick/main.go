@@ -37,27 +37,27 @@ import (
 var (
 	url = kingpin.Flag("url", "WAMP URL to connect to").
 		Default("ws://localhost:8080/ws").Envar("WICK_URL").String()
-	realm      = kingpin.Flag("realm", "The WAMP realm to join").Default("realm1").
+	realm = kingpin.Flag("realm", "The WAMP realm to join").Default("realm1").
 		Envar("WICK_REALM").String()
 	authMethod = kingpin.Flag("authmethod", "The authentication method to use").Envar("WICK_AUTHMETHOD").
 			Default("anonymous").Enum("anonymous", "ticket", "wampcra", "cryptosign")
-	authid   = kingpin.Flag("authid", "The authid to use, if authenticating").Envar("WICK_AUTHID").
+	authid = kingpin.Flag("authid", "The authid to use, if authenticating").Envar("WICK_AUTHID").
 		String()
 	authrole = kingpin.Flag("authrole", "The authrole to use, if authenticating").
-		Envar("WICK_AUTHROLE").String()
-	secret   = kingpin.Flag("secret", "The secret to use in Challenge-Response Auth.").
-			Envar("WICK_SECRET").String()
+			Envar("WICK_AUTHROLE").String()
+	secret = kingpin.Flag("secret", "The secret to use in Challenge-Response Auth.").
+		Envar("WICK_SECRET").String()
 	privateKey = kingpin.Flag("private-key", "The ed25519 private key hex for cryptosign").
 			Envar("WICK_PRIVATE_KEY").String()
-	ticket     = kingpin.Flag("ticket", "The ticket when using ticket authentication").
+	ticket = kingpin.Flag("ticket", "The ticket when using ticket authentication").
 		Envar("WICK_TICKET").String()
 	serializer = kingpin.Flag("serializer", "The serializer to use").Envar("WICK_SERIALIZER").
-		Default("json").Enum("json", "msgpack", "cbor")
+			Default("json").Enum("json", "msgpack", "cbor")
 
 	subscribe      = kingpin.Command("subscribe", "subscribe a topic.")
 	subscribeTopic = subscribe.Arg("topic", "Topic to subscribe to").Required().String()
 	subscribeMatch = subscribe.Flag("match", "pattern to use for subscribe").Default(wamp.MatchExact).
-		Enum(wamp.MatchExact, wamp.MatchPrefix, wamp.MatchWildcard)
+			Enum(wamp.MatchExact, wamp.MatchPrefix, wamp.MatchWildcard)
 	subscribePrintDetails = subscribe.Flag("details", "print event details").Bool()
 
 	publish            = kingpin.Command("publish", "Publish to a topic.")
@@ -68,6 +68,7 @@ var (
 	register          = kingpin.Command("register", "Register a procedure.")
 	registerProcedure = register.Arg("procedure", "procedure name").Required().String()
 	onInvocationCmd   = register.Arg("command", "Shell command to run and return it's output").String()
+	delay             = register.Flag("delay", "Register procedure after delay (in seconds)").Int()
 
 	call            = kingpin.Command("call", "Call a procedure.")
 	callProcedure   = call.Arg("procedure", "Procedure to call").Required().String()
@@ -148,7 +149,7 @@ func main() {
 	case publish.FullCommand():
 		wick.Publish(session, *publishTopic, *publishArgs, *publishKeywordArgs)
 	case register.FullCommand():
-		wick.Register(session, *registerProcedure, *onInvocationCmd)
+		wick.Register(session, *registerProcedure, *onInvocationCmd, *delay)
 	case call.FullCommand():
 		wick.Call(session, *callProcedure, *callArgs, *callKeywordArgs)
 	}
