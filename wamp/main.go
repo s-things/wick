@@ -288,7 +288,7 @@ func Register(session *client.Client, procedure string, command string, delay in
 	}
 
 	if delay > 0 {
-		fmt.Printf("procedure will be registered after %d seconds.\n", delay)
+		logger.Printf("procedure will be registered after %d seconds.\n", delay)
 		time.Sleep(time.Duration(delay) * time.Second)
 	}
 
