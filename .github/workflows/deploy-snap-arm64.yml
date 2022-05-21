@@ -20,4 +20,6 @@ jobs:
     steps:
       - name: Deploy
         run: |
+          mkdir -p ~/ci-artifacts
+          cp wick_*.snap ~/ci-artifacts/wick_arm64.snap
           snapcraft upload ~/ci-artifacts/wick_arm64.snap
