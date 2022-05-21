@@ -12,14 +12,12 @@ on:
 jobs:
   deploy:
     if: github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main'
-    runs-on: [ self-hosted ]
+    runs-on: self-hosted
 
     env:
       SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
     steps:
-      - name: Deploy
+      - name: deploy
         run: |
-          mkdir -p ~/ci-artifacts
-          cp wick_*.snap ~/ci-artifacts/wick_arm64.snap
           snapcraft upload ~/ci-artifacts/wick_arm64.snap
