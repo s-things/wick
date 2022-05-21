@@ -1,0 +1,21 @@
+
+name: build arm64 snap
+
+on:
+  push:
+    branches:  
+      - main 
+  pull_request:
+    branches: 
+      - main 
+
+jobs:
+  check:
+    runs-on: self-hosted
+
+    steps:
+      - name: checkout git repository
+        uses: actions/checkout@v2
+
+      - name: build snap
+        run:  snapcraft --use-lxd
