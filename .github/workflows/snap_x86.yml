@@ -25,5 +25,3 @@ jobs:
          
       - name: build snap
         run:  snapcraft --use-lxd
-      
-      
