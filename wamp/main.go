@@ -270,8 +270,24 @@ func Publish(session *client.Client, topic string, args []string, kwargs map[str
 	}
 }
 
-func Register(session *client.Client, procedure string, command string, delay int) {
+func Register(session *client.Client, procedure string, command string, delay int, invokeCount int) {
+
+	var isInvokeEnabled = false
+
+	if invokeCount > 0 {
+		*&isInvokeEnabled = true
+	}
+
 	eventHandler := func(ctx context.Context, inv *wamp.Invocation) client.InvokeResult {
+
+		if isInvokeEnabled {
+			invokeCount--
+			if invokeCount == 0 {
+				session.Done()
+				logger.Println("session closing")
+				os.Exit(1)
+			}
+		}
 
 		argsKWArgs(inv.Arguments, inv.ArgumentsKw, nil)
 
