@@ -272,7 +272,7 @@ func Publish(session *client.Client, topic string, args []string, kwargs map[str
 
 func Register(session *client.Client, procedure string, command string, delay int, invokeCount int) {
 
-	var hasMaxInvokeCount = false
+	hasMaxInvokeCount := false
 
 	if invokeCount > 0 {
 		hasMaxInvokeCount = true
@@ -294,9 +294,15 @@ func Register(session *client.Client, procedure string, command string, delay in
 		if hasMaxInvokeCount {
 			invokeCount--
 			if invokeCount == 0 {
-				session.Done()
-				logger.Println("session closing")
-				os.Exit(0)
+				// FIXME This is really a hack because
+				//  there is no guarantee that the caller
+				//  has actually received the result
+				time.AfterFunc(1*time.Second, func() {
+					logger.Println("after time called")
+					session.Done()
+					logger.Println("session closing")
+					os.Exit(0)
+				})
 			}
 		}
 
