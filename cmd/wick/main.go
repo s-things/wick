@@ -70,7 +70,7 @@ var (
 	onInvocationCmd   = register.Arg("command", "Shell command to run and return it's output").String()
 	delay             = register.Flag("delay", "Register procedure after delay (in seconds)").Int()
 	invokeCount       = register.Flag("invoke-count", "Leave session after it's called requested times").Int()
-	registerOptions   = register.Flag("option", "provide register options").Short('o').StringMap()
+	registerOptions   = register.Flag("option", "procedure registrations option").Short('o').StringMap()
 
 	call            = kingpin.Command("call", "Call a procedure.")
 	callProcedure   = call.Arg("procedure", "Procedure to call").Required().String()
