@@ -70,6 +70,7 @@ var (
 	onInvocationCmd   = register.Arg("command", "Shell command to run and return it's output").String()
 	delay             = register.Flag("delay", "Register procedure after delay (in seconds)").Int()
 	invokeCount       = register.Flag("invoke-count", "Leave session after it's called requested times").Int()
+	registerOptions   = register.Flag("option", "provide register options").Short('o').StringMap()
 
 	call            = kingpin.Command("call", "Call a procedure.")
 	callProcedure   = call.Arg("procedure", "Procedure to call").Required().String()
@@ -150,7 +151,7 @@ func main() {
 	case publish.FullCommand():
 		wick.Publish(session, *publishTopic, *publishArgs, *publishKeywordArgs)
 	case register.FullCommand():
-		wick.Register(session, *registerProcedure, *onInvocationCmd, *delay, *invokeCount)
+		wick.Register(session, *registerProcedure, *onInvocationCmd, *delay, *invokeCount, *registerOptions)
 	case call.FullCommand():
 		wick.Call(session, *callProcedure, *callArgs, *callKeywordArgs)
 	}

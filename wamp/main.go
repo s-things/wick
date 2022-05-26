@@ -270,7 +270,7 @@ func Publish(session *client.Client, topic string, args []string, kwargs map[str
 	}
 }
 
-func Register(session *client.Client, procedure string, command string, delay int, invokeCount int) {
+func Register(session *client.Client, procedure string, command string, delay int, invokeCount int, registerOptions map[string]string) {
 
 	// If the user has called with --invoke-count
 	hasMaxInvokeCount := invokeCount > 0
@@ -309,7 +309,7 @@ func Register(session *client.Client, procedure string, command string, delay in
 		time.Sleep(time.Duration(delay) * time.Second)
 	}
 
-	if err := session.Register(procedure, eventHandler, nil); err != nil {
+	if err := session.Register(procedure, eventHandler, dictToWampDict(registerOptions)); err != nil {
 		logger.Fatal("Failed to register procedure:", err)
 	} else {
 		logger.Printf("Registered procedure '%s'\n", procedure)
