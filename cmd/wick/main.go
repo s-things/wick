@@ -76,6 +76,7 @@ var (
 	callProcedure   = call.Arg("procedure", "Procedure to call").Required().String()
 	callArgs        = call.Arg("args", "give the arguments").Strings()
 	callKeywordArgs = call.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
+	callTime        = call.Flag("time", "print the time call took").Bool()
 )
 
 const versionString = "0.3.0"
@@ -153,6 +154,6 @@ func main() {
 	case register.FullCommand():
 		wick.Register(session, *registerProcedure, *onInvocationCmd, *delay, *invokeCount, *registerOptions)
 	case call.FullCommand():
-		wick.Call(session, *callProcedure, *callArgs, *callKeywordArgs)
+		wick.Call(session, *callProcedure, *callArgs, *callKeywordArgs, *callTime)
 	}
 }
