@@ -333,7 +333,9 @@ func Register(session *client.Client, procedure string, command string, delay in
 
 }
 
-func Call(session *client.Client, procedure string, args []string, kwargs map[string]string, logCallTime bool, repeatCount int) {
+func Call(session *client.Client, procedure string, args []string, kwargs map[string]string,
+	logCallTime bool, repeatCount int, delayCall int) {
+
 	ctx := context.Background()
 
 	startTime := time.Now().UnixMilli()
@@ -354,6 +356,7 @@ func Call(session *client.Client, procedure string, args []string, kwargs map[st
 			endTime := time.Now().UnixMilli()
 			logger.Printf("call took %dms\n", endTime-startTime)
 		}
+		time.Sleep(time.Duration(delayCall) * time.Millisecond)
 	}
 	if logCallTime && repeatCount > 1 {
 		endTime := time.Now().UnixMilli()

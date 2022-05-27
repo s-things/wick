@@ -40,24 +40,24 @@ var (
 	realm = kingpin.Flag("realm", "The WAMP realm to join").Default("realm1").
 		Envar("WICK_REALM").String()
 	authMethod = kingpin.Flag("authmethod", "The authentication method to use").Envar("WICK_AUTHMETHOD").
-			Default("anonymous").Enum("anonymous", "ticket", "wampcra", "cryptosign")
+		Default("anonymous").Enum("anonymous", "ticket", "wampcra", "cryptosign")
 	authid = kingpin.Flag("authid", "The authid to use, if authenticating").Envar("WICK_AUTHID").
 		String()
 	authrole = kingpin.Flag("authrole", "The authrole to use, if authenticating").
-			Envar("WICK_AUTHROLE").String()
+		Envar("WICK_AUTHROLE").String()
 	secret = kingpin.Flag("secret", "The secret to use in Challenge-Response Auth.").
 		Envar("WICK_SECRET").String()
 	privateKey = kingpin.Flag("private-key", "The ed25519 private key hex for cryptosign").
-			Envar("WICK_PRIVATE_KEY").String()
+		Envar("WICK_PRIVATE_KEY").String()
 	ticket = kingpin.Flag("ticket", "The ticket when using ticket authentication").
 		Envar("WICK_TICKET").String()
 	serializer = kingpin.Flag("serializer", "The serializer to use").Envar("WICK_SERIALIZER").
-			Default("json").Enum("json", "msgpack", "cbor")
+		Default("json").Enum("json", "msgpack", "cbor")
 
 	subscribe      = kingpin.Command("subscribe", "subscribe a topic.")
 	subscribeTopic = subscribe.Arg("topic", "Topic to subscribe to").Required().String()
 	subscribeMatch = subscribe.Flag("match", "pattern to use for subscribe").Default(wamp.MatchExact).
-			Enum(wamp.MatchExact, wamp.MatchPrefix, wamp.MatchWildcard)
+		Enum(wamp.MatchExact, wamp.MatchPrefix, wamp.MatchWildcard)
 	subscribePrintDetails = subscribe.Flag("details", "print event details").Bool()
 
 	publish            = kingpin.Command("publish", "Publish to a topic.")
@@ -78,6 +78,7 @@ var (
 	callKeywordArgs = call.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
 	logCallTime     = call.Flag("time", "log call return time").Bool()
 	repeatCount     = call.Flag("repeat", "call the procedure for the provided number of times").Default("1").Int()
+	delayCall       = call.Flag("delay", "provide the delay in milliseconds").Default("0").Int()
 )
 
 const versionString = "0.3.0"
@@ -145,10 +146,6 @@ func main() {
 		session = wick.ConnectCryptoSign(*url, *realm, serializerToUse, *authid, *authrole, *privateKey)
 	}
 
-	if *repeatCount < 1 {
-		logger.Fatal("repeat count must be greater than zero")
-	}
-
 	defer session.Close()
 
 	switch cmd {
@@ -159,6 +156,9 @@ func main() {
 	case register.FullCommand():
 		wick.Register(session, *registerProcedure, *onInvocationCmd, *delay, *invokeCount, *registerOptions)
 	case call.FullCommand():
-		wick.Call(session, *callProcedure, *callArgs, *callKeywordArgs, *logCallTime, *repeatCount)
+		if *repeatCount < 1 {
+			logger.Fatal("repeat count must be greater than zero")
+		}
+		wick.Call(session, *callProcedure, *callArgs, *callKeywordArgs, *logCallTime, *repeatCount, *delayCall)
 	}
 }
