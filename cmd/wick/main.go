@@ -145,6 +145,10 @@ func main() {
 		session = wick.ConnectCryptoSign(*url, *realm, serializerToUse, *authid, *authrole, *privateKey)
 	}
 
+	if *repeatCount < 1 {
+		logger.Fatal("repeat count must be greater than zero")
+	}
+
 	defer session.Close()
 
 	switch cmd {

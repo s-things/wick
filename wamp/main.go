@@ -339,6 +339,7 @@ func Call(session *client.Client, procedure string, args []string, kwargs map[st
 	startTime := time.Now().UnixMilli()
 
 	for i := 0; i < repeatCount; i++ {
+		startTime := time.Now().UnixMilli()
 		result, err := session.Call(ctx, procedure, nil, listToWampList(args), dictToWampDict(kwargs), nil)
 		if err != nil {
 			logger.Fatal(err)
@@ -349,10 +350,14 @@ func Call(session *client.Client, procedure string, args []string, kwargs map[st
 			}
 			fmt.Println(string(jsonString))
 		}
+		if logCallTime {
+			endTime := time.Now().UnixMilli()
+			logger.Printf("call took %dms\n", endTime-startTime)
+		}
 	}
-	if logCallTime {
+	if logCallTime && repeatCount > 1 {
 		endTime := time.Now().UnixMilli()
-		logger.Printf("call took %dms\n", endTime-startTime)
+		logger.Printf("%d calls took %dms\n", repeatCount, endTime-startTime)
 	}
 }
 
