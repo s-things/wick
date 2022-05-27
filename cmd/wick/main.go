@@ -77,7 +77,7 @@ var (
 	callArgs        = call.Arg("args", "give the arguments").Strings()
 	callKeywordArgs = call.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
 	logCallTime     = call.Flag("time", "log call return time").Bool()
-	repeatCount     = call.Flag("repeat-count", "call the procedure for the provided number of times").Default("1").Int()
+	repeatCount     = call.Flag("repeat", "call the procedure for the provided number of times").Default("1").Int()
 )
 
 const versionString = "0.3.0"
