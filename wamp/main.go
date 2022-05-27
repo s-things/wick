@@ -340,7 +340,7 @@ func Call(session *client.Client, procedure string, args []string, kwargs map[st
 	result, err := session.Call(ctx, procedure, nil, listToWampList(args), dictToWampDict(kwargs), nil)
 	if timeBool {
 		endTime := time.Now().UnixMilli()
-		logger.Println("time taken = ", endTime-startTime)
+		logger.Println("call took", endTime-startTime, "ms")
 	}
 	if err != nil {
 		logger.Println(err)
