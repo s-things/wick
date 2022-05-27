@@ -333,23 +333,26 @@ func Register(session *client.Client, procedure string, command string, delay in
 
 }
 
-func Call(session *client.Client, procedure string, args []string, kwargs map[string]string, logCallTime bool) {
+func Call(session *client.Client, procedure string, args []string, kwargs map[string]string, logCallTime bool, repeatCount int) {
 	ctx := context.Background()
 
 	startTime := time.Now().UnixMilli()
-	result, err := session.Call(ctx, procedure, nil, listToWampList(args), dictToWampDict(kwargs), nil)
+
+	for i := 0; i < repeatCount; i++ {
+		result, err := session.Call(ctx, procedure, nil, listToWampList(args), dictToWampDict(kwargs), nil)
+		if err != nil {
+			logger.Fatal(err)
+		} else if result != nil && len(result.Arguments) > 0 {
+			jsonString, err := json.MarshalIndent(result.Arguments[0], "", "    ")
+			if err != nil {
+				logger.Fatal(err)
+			}
+			fmt.Println(string(jsonString))
+		}
+	}
 	if logCallTime {
 		endTime := time.Now().UnixMilli()
 		logger.Printf("call took %dms\n", endTime-startTime)
-	}
-	if err != nil {
-		logger.Println(err)
-	} else if result != nil && len(result.Arguments) > 0 {
-		jsonString, err := json.MarshalIndent(result.Arguments[0], "", "    ")
-		if err != nil {
-			logger.Fatal(err)
-		}
-		fmt.Println(string(jsonString))
 	}
 }
 
