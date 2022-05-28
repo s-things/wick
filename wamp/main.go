@@ -341,6 +341,7 @@ func Call(session *client.Client, procedure string, args []string, kwargs map[st
 	startTime := time.Now().UnixMilli()
 
 	for i := 0; i < repeatCount; i++ {
+		time.Sleep(time.Duration(delayCall) * time.Millisecond)
 		startTime := time.Now().UnixMilli()
 		result, err := session.Call(ctx, procedure, nil, listToWampList(args), dictToWampDict(kwargs), nil)
 		if err != nil {
@@ -356,7 +357,6 @@ func Call(session *client.Client, procedure string, args []string, kwargs map[st
 			endTime := time.Now().UnixMilli()
 			logger.Printf("call took %dms\n", endTime-startTime)
 		}
-		time.Sleep(time.Duration(delayCall) * time.Millisecond)
 	}
 	if logCallTime && repeatCount > 1 {
 		endTime := time.Now().UnixMilli()
