@@ -10,7 +10,7 @@ on:
 
 jobs:
   check:
-    runs-on: self-hosted
+    runs-on: [self-hosted, arm64-server-1]
 
     steps:
       - name: checkout git repository

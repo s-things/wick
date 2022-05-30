@@ -2,25 +2,28 @@ name: build-x86-snap
 
 on:
   push:
-    branches:  
-      - main 
+    branches:
+      - main
   pull_request:
-    branches: 
-      - main 
+    branches:
+      - main
 
 jobs:
   check:
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted, amd64-server-2]
 
     steps:
       - name: checkout git repository
         uses: actions/checkout@v2
 
-      - name: setup snapcraft
-        run: |
-         sudo lxd init --auto 
-         sudo snap install snapcraft --classic
-         sudo chown $USER:$USER /var/snap/lxd/common/lxd/unix.socket
-         
       - name: build snap
-        run:  snapcraft --use-lxd
+        run: |
+          snapcraft clean --use-lxd wick
+          snapcraft --use-lxd
+
+      - name: copy build artifacts
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: |
+          rm -rf /tmp/ci-artifacts-x86
+          mkdir -p /tmp/ci-artifacts-x86
+          cp $(realpath wick_*.snap) /tmp/ci-artifacts-x86
