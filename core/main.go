@@ -129,11 +129,10 @@ func Subscribe(session *client.Client, topic string, match string, printDetails 
 	}
 }
 
-func Publish(session *client.Client, topic string, args []string, kwargs map[string]string) {
+func Publish(session *client.Client, topic string, args []string, kwargs map[string]string, publishOptions map[string]string) {
 
 	// Publish to topic.
-	options := wamp.Dict{wamp.OptAcknowledge: true}
-	err := session.Publish(topic, options, listToWampList(args), dictToWampDict(kwargs))
+	err := session.Publish(topic, dictToWampDict(publishOptions), listToWampList(args), dictToWampDict(kwargs))
 	if err != nil {
 		logger.Fatal("Publish error:", err)
 	} else {
