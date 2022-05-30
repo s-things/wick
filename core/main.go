@@ -204,7 +204,7 @@ func Register(session *client.Client, procedure string, command string, delay in
 }
 
 func actuallyCall(session *client.Client, procedure string, args []string, kwargs map[string]string, logCallTime bool,
-	delayCall int, group *sync.WaitGroup) {
+	delayCall int, group *sync.WaitGroup, callOptions map[string]string) {
 
 	if group != nil {
 		defer group.Done()
@@ -215,7 +215,7 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 	}
 
 	startTime := time.Now().UnixMilli()
-	result, err := session.Call(context.Background(), procedure, nil, listToWampList(args), dictToWampDict(kwargs), nil)
+	result, err := session.Call(context.Background(), procedure, dictToWampDict(callOptions), listToWampList(args), dictToWampDict(kwargs), nil)
 	if err != nil {
 		logger.Fatal(err)
 	} else if result != nil && len(result.Arguments) > 0 {
@@ -233,7 +233,7 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 }
 
 func Call(session *client.Client, procedure string, args []string, kwargs map[string]string,
-	logCallTime bool, repeatCount int, delayCall int, parallelCall bool) {
+	logCallTime bool, repeatCount int, delayCall int, parallelCall bool, callOptions map[string]string) {
 
 	startTime := time.Now().UnixMilli()
 
@@ -242,13 +242,13 @@ func Call(session *client.Client, procedure string, args []string, kwargs map[st
 		wg.Add(repeatCount)
 
 		for i := 0; i < repeatCount; i++ {
-			go actuallyCall(session, procedure, args, kwargs, logCallTime, delayCall, &wg)
+			go actuallyCall(session, procedure, args, kwargs, logCallTime, delayCall, &wg, callOptions)
 		}
 
 		wg.Wait()
 	} else {
 		for i := 0; i < repeatCount; i++ {
-			actuallyCall(session, procedure, args, kwargs, logCallTime, delayCall, nil)
+			actuallyCall(session, procedure, args, kwargs, logCallTime, delayCall, nil, callOptions)
 		}
 	}
 
