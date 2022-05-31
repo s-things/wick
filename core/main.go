@@ -129,7 +129,16 @@ func Subscribe(session *client.Client, topic string, match string, printDetails 
 	}
 }
 
-func Publish(session *client.Client, topic string, args []string, kwargs map[string]string, publishOptions map[string]string) {
+func actualPublish(session *client.Client, topic string, args []string, kwargs map[string]string, logPublishTime bool,
+	delayPublish int, group *sync.WaitGroup, publishOptions map[string]string) {
+	if group != nil {
+		defer group.Done()
+	}
+	if delayPublish > 0 {
+		time.Sleep(time.Duration(delayPublish) * time.Millisecond)
+	}
+
+	startTime := time.Now().UnixMilli()
 
 	// Publish to topic.
 	err := session.Publish(topic, dictToWampDict(publishOptions), listToWampList(args), dictToWampDict(kwargs))
@@ -137,6 +146,37 @@ func Publish(session *client.Client, topic string, args []string, kwargs map[str
 		logger.Fatal("Publish error:", err)
 	} else {
 		logger.Printf("Published to topic '%s'\n", topic)
+	}
+
+	if logPublishTime {
+		endTime := time.Now().UnixMilli()
+		logger.Printf("call took %dms\n", endTime-startTime)
+	}
+}
+
+func Publish(session *client.Client, topic string, args []string, kwargs map[string]string, publishOptions map[string]string,
+	logPublishTime bool, repeatPublish int, delayPublish int, parallelPublish bool) {
+
+	startTime := time.Now().UnixMilli()
+
+	if parallelPublish {
+		var wg sync.WaitGroup
+		wg.Add(repeatPublish)
+
+		for i := 0; i < repeatPublish; i++ {
+			go actualPublish(session, topic, args, kwargs, logPublishTime, delayPublish, &wg, publishOptions)
+		}
+
+		wg.Wait()
+	} else {
+		for i := 0; i < repeatPublish; i++ {
+			actualPublish(session, topic, args, kwargs, logPublishTime, delayPublish, nil, publishOptions)
+		}
+	}
+
+	if logPublishTime && repeatPublish > 1 {
+		endTime := time.Now().UnixMilli()
+		logger.Printf("%d calls took %dms\n", repeatPublish, endTime-startTime)
 	}
 }
 

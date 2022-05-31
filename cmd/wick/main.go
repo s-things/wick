@@ -66,6 +66,11 @@ var (
 	publishArgs        = publish.Arg("args", "give the arguments").Strings()
 	publishKeywordArgs = publish.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
 	publishOptions     = publish.Flag("option", "publish option").Short('o').StringMap()
+	repeatPublish      = publish.Flag("repeat", "Publish to the topic for the provided number of times").Default("1").Int()
+	logPublishTime     = publish.Flag("time", "log publish return time").Bool()
+	delayPublish       = publish.Flag("delay", "provide the delay in milliseconds").Default("0").Int()
+	parallelPublish    = publish.Flag("parallel", "publish the topic parallel without waiting for the result to return. "+
+		"Only effective when called with --repeat").Bool()
 
 	register          = kingpin.Command("register", "Register a procedure.")
 	registerProcedure = register.Arg("procedure", "procedure name").Required().String()
@@ -164,7 +169,8 @@ func main() {
 	case subscribe.FullCommand():
 		core.Subscribe(session, *subscribeTopic, *subscribeMatch, *subscribePrintDetails)
 	case publish.FullCommand():
-		core.Publish(session, *publishTopic, *publishArgs, *publishKeywordArgs, *publishOptions)
+		core.Publish(session, *publishTopic, *publishArgs, *publishKeywordArgs, *publishOptions, *logPublishTime,
+			*repeatPublish, *delayPublish, *parallelPublish)
 	case register.FullCommand():
 		core.Register(session, *registerProcedure, *onInvocationCmd, *delay, *invokeCount, *registerOptions)
 	case call.FullCommand():
