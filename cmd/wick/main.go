@@ -27,7 +27,6 @@ package main
 import (
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/transport/serialize"
-	"github.com/gammazero/nexus/v3/wamp"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"time"
@@ -55,10 +54,9 @@ var (
 	serializer = kingpin.Flag("serializer", "The serializer to use").Envar("WICK_SERIALIZER").
 			Default("json").Enum("json", "msgpack", "cbor")
 
-	subscribe      = kingpin.Command("subscribe", "subscribe a topic.")
-	subscribeTopic = subscribe.Arg("topic", "Topic to subscribe to").Required().String()
-	subscribeMatch = subscribe.Flag("match", "pattern to use for subscribe").Default(wamp.MatchExact).
-			Enum(wamp.MatchExact, wamp.MatchPrefix, wamp.MatchWildcard)
+	subscribe             = kingpin.Command("subscribe", "subscribe a topic.")
+	subscribeTopic        = subscribe.Arg("topic", "Topic to subscribe to").Required().String()
+	subscribeOptions      = subscribe.Flag("option", "subscribe option").Short('o').StringMap()
 	subscribePrintDetails = subscribe.Flag("details", "print event details").Bool()
 
 	publish            = kingpin.Command("publish", "Publish to a topic.")
@@ -167,7 +165,7 @@ func main() {
 
 	switch cmd {
 	case subscribe.FullCommand():
-		core.Subscribe(session, *subscribeTopic, *subscribeMatch, *subscribePrintDetails)
+		core.Subscribe(session, *subscribeTopic, *subscribeOptions, *subscribePrintDetails)
 	case publish.FullCommand():
 		core.Publish(session, *publishTopic, *publishArgs, *publishKeywordArgs, *publishOptions, *logPublishTime,
 			*repeatPublish, *delayPublish, *parallelPublish)

@@ -95,7 +95,7 @@ func ConnectCryptoSign(url string, realm string, serializer serialize.Serializat
 	return connect(url, cfg)
 }
 
-func Subscribe(session *client.Client, topic string, match string, printDetails bool) {
+func Subscribe(session *client.Client, topic string, subscribeOptions map[string]string, printDetails bool) {
 	// Define function to handle events received.
 	eventHandler := func(event *wamp.Event) {
 		if printDetails {
@@ -106,8 +106,7 @@ func Subscribe(session *client.Client, topic string, match string, printDetails 
 	}
 
 	// Subscribe to topic.
-	options := wamp.Dict{wamp.OptMatch: match}
-	err := session.Subscribe(topic, eventHandler, options)
+	err := session.Subscribe(topic, eventHandler, dictToWampDict(subscribeOptions))
 	if err != nil {
 		logger.Fatal("subscribe error:", err)
 	} else {
