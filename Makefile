@@ -4,6 +4,10 @@ deps:
 build:
 	go build github.com/s-things/wick/cmd/wick
 
+test:
+	go test github.com/s-things/wick/cmd/wick -v
+	go test github.com/s-things/wick/core -v
+
 run:
 	./wick
 

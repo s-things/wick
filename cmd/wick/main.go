@@ -26,7 +26,6 @@ package main
 
 import (
 	"github.com/gammazero/nexus/v3/client"
-	"github.com/gammazero/nexus/v3/transport/serialize"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"time"
@@ -95,15 +94,7 @@ func main() {
 	kingpin.Version(versionString).VersionFlag.Short('v')
 	cmd := kingpin.Parse()
 
-	serializerToUse := serialize.JSON
-
-	switch *serializer {
-	case "json":
-	case "msgpack":
-		serializerToUse = serialize.MSGPACK
-	case "cbor":
-		serializerToUse = serialize.CBOR
-	}
+	serializerToUse := getSerializerByName(*serializer)
 
 	logger := logrus.New()
 
@@ -115,12 +106,9 @@ func main() {
 		logger.Fatal("Provide only one of private key, ticket or secret")
 	}
 
-	if *privateKey != "" {
-		*authMethod = "cryptosign"
-	} else if *ticket != "" {
-		*authMethod = "ticket"
-	} else if *secret != "" {
-		*authMethod = "wampcra"
+	// auto decide authmethod if user didn't explicitly request
+	if *authMethod == "anonymous" {
+		*authMethod = selectAuthMethod(*privateKey, *ticket, *secret)
 	}
 
 	var session *client.Client

@@ -1,13 +1,40 @@
+/*
+*
+* Copyright 2021-2022 Simple Things Inc.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+ */
+
 package core
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/gammazero/nexus/v3/wamp"
+	"golang.org/x/crypto/ed25519"
 	"log"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 func listToWampList(args []string) wamp.List {
@@ -103,4 +130,30 @@ func shellOut(command string) (error, string, string) {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	return err, stdout.String(), stderr.String()
+}
+
+func getKeyPair(privateKeyKex string) (ed25519.PublicKey, ed25519.PrivateKey) {
+	privateKeyRaw, _ := hex.DecodeString(privateKeyKex)
+	var privateKey ed25519.PrivateKey
+
+	if len(privateKeyRaw) == 32 {
+		privateKey = ed25519.NewKeyFromSeed(privateKeyRaw)
+	} else if len(privateKeyRaw) == 64 {
+		privateKey = ed25519.NewKeyFromSeed(privateKeyRaw[:32])
+	} else {
+		logger.Fatal("Invalid private key. Cryptosign private key must be either 32 or 64 characters long")
+	}
+
+	publicKey := privateKey.Public().(ed25519.PublicKey)
+
+	return publicKey, privateKey
+}
+
+func sanitizeURL(url string) string {
+	if strings.HasPrefix(url, "rs") {
+		return "tcp" + strings.TrimPrefix(url, "rs")
+	} else if strings.HasPrefix(url, "rss") {
+		return "tcp" + strings.TrimPrefix(url, "rss")
+	}
+	return url
 }

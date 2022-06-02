@@ -31,7 +31,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
-	"strings"
 	"sync"
 	"time"
 
@@ -47,11 +46,9 @@ func init() {
 }
 
 func connect(url string, cfg client.Config) *client.Client {
-	if strings.HasPrefix(url, "rs") {
-		url = "tcp" + strings.TrimPrefix(url, "rs")
-	} else if strings.HasPrefix(url, "rss") {
-		url = "tcp" + strings.TrimPrefix(url, "rss")
-	}
+
+	url = sanitizeURL(url)
+
 	session, err := client.ConnectNet(context.Background(), url, cfg)
 	if err != nil {
 		logger.Fatal(err)
