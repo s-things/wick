@@ -34,58 +34,58 @@ import (
 )
 
 var (
-	url = kingpin.Flag("url", "WAMP URL to connect to").
+	url = kingpin.Flag("url", "WAMP URL to connect to.").
 		Default("ws://localhost:8080/ws").Envar("WICK_URL").String()
-	realm = kingpin.Flag("realm", "The WAMP realm to join").Default("realm1").
+	realm = kingpin.Flag("realm", "The WAMP realm to join.").Default("realm1").
 		Envar("WICK_REALM").String()
-	authMethod = kingpin.Flag("authmethod", "The authentication method to use").Envar("WICK_AUTHMETHOD").
+	authMethod = kingpin.Flag("authmethod", "The authentication method to use.").Envar("WICK_AUTHMETHOD").
 			Default("anonymous").Enum("anonymous", "ticket", "wampcra", "cryptosign")
-	authid = kingpin.Flag("authid", "The authid to use, if authenticating").Envar("WICK_AUTHID").
+	authid = kingpin.Flag("authid", "The authid to use, if authenticating.").Envar("WICK_AUTHID").
 		String()
-	authrole = kingpin.Flag("authrole", "The authrole to use, if authenticating").
+	authrole = kingpin.Flag("authrole", "The authrole to use, if authenticating.").
 			Envar("WICK_AUTHROLE").String()
 	secret = kingpin.Flag("secret", "The secret to use in Challenge-Response Auth.").
 		Envar("WICK_SECRET").String()
-	privateKey = kingpin.Flag("private-key", "The ed25519 private key hex for cryptosign").
+	privateKey = kingpin.Flag("private-key", "The ed25519 private key hex for cryptosign.").
 			Envar("WICK_PRIVATE_KEY").String()
-	ticket = kingpin.Flag("ticket", "The ticket when using ticket authentication").
+	ticket = kingpin.Flag("ticket", "The ticket when using ticket authentication.").
 		Envar("WICK_TICKET").String()
-	serializer = kingpin.Flag("serializer", "The serializer to use").Envar("WICK_SERIALIZER").
+	serializer = kingpin.Flag("serializer", "The serializer to use.").Envar("WICK_SERIALIZER").
 			Default("json").Enum("json", "msgpack", "cbor")
 
-	subscribe             = kingpin.Command("subscribe", "subscribe a topic.")
-	subscribeTopic        = subscribe.Arg("topic", "Topic to subscribe to").Required().String()
-	subscribeOptions      = subscribe.Flag("option", "subscribe option").Short('o').StringMap()
-	subscribePrintDetails = subscribe.Flag("details", "print event details").Bool()
+	subscribe             = kingpin.Command("subscribe", "Subscribe a topic.")
+	subscribeTopic        = subscribe.Arg("topic", "Topic to subscribe.").Required().String()
+	subscribeOptions      = subscribe.Flag("option", "Subscribe option.(May be call multiple times)").Short('o').StringMap()
+	subscribePrintDetails = subscribe.Flag("details", "Print event details.").Bool()
 
 	publish            = kingpin.Command("publish", "Publish to a topic.")
-	publishTopic       = publish.Arg("topic", "topic name").Required().String()
-	publishArgs        = publish.Arg("args", "give the arguments").Strings()
-	publishKeywordArgs = publish.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
-	publishOptions     = publish.Flag("option", "publish option").Short('o').StringMap()
-	repeatPublish      = publish.Flag("repeat", "Publish to the topic for the provided number of times").Default("1").Int()
-	logPublishTime     = publish.Flag("time", "log publish return time").Bool()
-	delayPublish       = publish.Flag("delay", "provide the delay in milliseconds").Default("0").Int()
-	parallelPublish    = publish.Flag("parallel", "publish the topic parallel without waiting for the result to return. "+
-		"Only effective when called with --repeat").Bool()
+	publishTopic       = publish.Arg("topic", "Topic to publish.").Required().String()
+	publishArgs        = publish.Arg("args", "Provide the arguments.").Strings()
+	publishKeywordArgs = publish.Flag("kwarg", "Provide the keyword arguments.").Short('k').StringMap()
+	publishOptions     = publish.Flag("option", "Publish option.(May be call multiple times)").Short('o').StringMap()
+	repeatPublish      = publish.Flag("repeat", "Publish to the topic for the provided number of times.").Default("1").Int()
+	logPublishTime     = publish.Flag("time", "Log publish return time.").Bool()
+	delayPublish       = publish.Flag("delay", "Provide the delay in milliseconds.").Default("0").Int()
+	parallelPublish    = publish.Flag("parallel", "Publish the topic parallel without waiting for the result to return. "+
+		"Only effective when called with --repeat.").Bool()
 
 	register          = kingpin.Command("register", "Register a procedure.")
-	registerProcedure = register.Arg("procedure", "procedure name").Required().String()
-	onInvocationCmd   = register.Arg("command", "Shell command to run and return it's output").String()
-	delay             = register.Flag("delay", "Register procedure after delay (in milliseconds)").Int()
-	invokeCount       = register.Flag("invoke-count", "Leave session after it's called requested times").Int()
-	registerOptions   = register.Flag("option", "procedure registration option").Short('o').StringMap()
+	registerProcedure = register.Arg("procedure", "Procedure name.").Required().String()
+	onInvocationCmd   = register.Arg("command", "Shell command to run and return it's output.").String()
+	delay             = register.Flag("delay", "Register procedure after delay.(in milliseconds)").Int()
+	invokeCount       = register.Flag("invoke-count", "Leave session after it's called requested times.").Int()
+	registerOptions   = register.Flag("option", "Procedure registration option.(May be call multiple times)").Short('o').StringMap()
 
 	call            = kingpin.Command("call", "Call a procedure.")
-	callProcedure   = call.Arg("procedure", "Procedure to call").Required().String()
-	callArgs        = call.Arg("args", "give the arguments").Strings()
-	callKeywordArgs = call.Flag("kwarg", "give the keyword arguments").Short('k').StringMap()
-	logCallTime     = call.Flag("time", "log call return time").Bool()
-	repeatCount     = call.Flag("repeat", "call the procedure for the provided number of times").Default("1").Int()
-	delayCall       = call.Flag("delay", "provide the delay in milliseconds").Default("0").Int()
-	callOptions     = call.Flag("option", "procedure call option").Short('o').StringMap()
-	parallelCall    = call.Flag("parallel", "call the procedure parallel without waiting for the result to return. "+
-		"Only effective when called with --repeat").Bool()
+	callProcedure   = call.Arg("procedure", "Procedure to call.").Required().String()
+	callArgs        = call.Arg("args", "Provide the arguments.").Strings()
+	callKeywordArgs = call.Flag("kwarg", "Provide the keyword arguments.").Short('k').StringMap()
+	logCallTime     = call.Flag("time", "Log call return time.").Bool()
+	repeatCount     = call.Flag("repeat", "Call the procedure for the provided number of times.").Default("1").Int()
+	delayCall       = call.Flag("delay", "Provide the delay in milliseconds.").Default("0").Int()
+	callOptions     = call.Flag("option", "Procedure call option.(May be call multiple times)").Short('o').StringMap()
+	parallelCall    = call.Flag("parallel", "Call the procedure parallel without waiting for the result to return. "+
+		"Only effective when called with --repeat.").Bool()
 )
 
 const versionString = "0.4.0-dev"
