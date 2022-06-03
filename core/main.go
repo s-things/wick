@@ -217,8 +217,8 @@ func Register(session *client.Client, procedure string, command string, delay in
 	}
 
 	if delay > 0 {
-		logger.Printf("procedure will be registered after %d seconds.\n", delay)
-		time.Sleep(time.Duration(delay) * time.Second)
+		logger.Printf("procedure will be registered after %d milliseconds.\n", delay)
+		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
 
 	if err := session.Register(procedure, eventHandler, dictToWampDict(registerOptions)); err != nil {

@@ -72,7 +72,7 @@ var (
 	register          = kingpin.Command("register", "Register a procedure.")
 	registerProcedure = register.Arg("procedure", "procedure name").Required().String()
 	onInvocationCmd   = register.Arg("command", "Shell command to run and return it's output").String()
-	delay             = register.Flag("delay", "Register procedure after delay (in seconds)").Int()
+	delay             = register.Flag("delay", "Register procedure after delay (in milliseconds)").Int()
 	invokeCount       = register.Flag("invoke-count", "Leave session after it's called requested times").Int()
 	registerOptions   = register.Flag("option", "procedure registration option").Short('o').StringMap()
 
