@@ -157,6 +157,9 @@ func main() {
 	case subscribe.FullCommand():
 		core.Subscribe(session, *subscribeTopic, *subscribeOptions, *subscribePrintDetails)
 	case publish.FullCommand():
+		if *repeatPublish < 1 {
+			logger.Fatal("repeat count must be greater than zero")
+		}
 		core.Publish(session, *publishTopic, *publishArgs, *publishKeywordArgs, *publishOptions, *logPublishTime,
 			*repeatPublish, *delayPublish, *parallelPublish)
 	case register.FullCommand():
