@@ -112,9 +112,11 @@ func main() {
 	}
 
 	var session *client.Client
+	var startTime int64
 
-	startTime := time.Now().UnixMilli()
-
+	if *logCallTime {
+		startTime = time.Now().UnixMilli()
+	}
 	switch *authMethod {
 	case "anonymous":
 		if *privateKey != "" {

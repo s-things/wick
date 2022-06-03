@@ -134,7 +134,10 @@ func actualPublish(session *client.Client, topic string, args []string, kwargs m
 		time.Sleep(time.Duration(delayPublish) * time.Millisecond)
 	}
 
-	startTime := time.Now().UnixMilli()
+	var startTime int64
+	if logPublishTime {
+		startTime = time.Now().UnixMilli()
+	}
 
 	// Publish to topic.
 	err := session.Publish(topic, dictToWampDict(publishOptions), listToWampList(args), dictToWampDict(kwargs))
@@ -153,7 +156,10 @@ func actualPublish(session *client.Client, topic string, args []string, kwargs m
 func Publish(session *client.Client, topic string, args []string, kwargs map[string]string, publishOptions map[string]string,
 	logPublishTime bool, repeatPublish int, delayPublish int, parallelPublish bool) {
 
-	startTime := time.Now().UnixMilli()
+	var startTime int64
+	if logPublishTime {
+		startTime = time.Now().UnixMilli()
+	}
 
 	if parallelPublish {
 		var wg sync.WaitGroup
@@ -250,7 +256,11 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 		time.Sleep(time.Duration(delayCall) * time.Millisecond)
 	}
 
-	startTime := time.Now().UnixMilli()
+	var startTime int64
+	if logCallTime {
+		startTime = time.Now().UnixMilli()
+	}
+
 	result, err := session.Call(context.Background(), procedure, dictToWampDict(callOptions), listToWampList(args), dictToWampDict(kwargs), nil)
 	if err != nil {
 		logger.Fatal(err)
@@ -271,7 +281,10 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 func Call(session *client.Client, procedure string, args []string, kwargs map[string]string,
 	logCallTime bool, repeatCount int, delayCall int, parallelCall bool, callOptions map[string]string) {
 
-	startTime := time.Now().UnixMilli()
+	var startTime int64
+	if logCallTime {
+		startTime = time.Now().UnixMilli()
+	}
 
 	if parallelCall {
 		var wg sync.WaitGroup
