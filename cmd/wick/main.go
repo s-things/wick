@@ -55,14 +55,14 @@ var (
 
 	subscribe             = kingpin.Command("subscribe", "Subscribe a topic.")
 	subscribeTopic        = subscribe.Arg("topic", "Topic to subscribe.").Required().String()
-	subscribeOptions      = subscribe.Flag("option", "Subscribe option.(May be call multiple times)").Short('o').StringMap()
+	subscribeOptions      = subscribe.Flag("option", "Subscribe option. (May be provided multiple times)").Short('o').StringMap()
 	subscribePrintDetails = subscribe.Flag("details", "Print event details.").Bool()
 
 	publish            = kingpin.Command("publish", "Publish to a topic.")
 	publishTopic       = publish.Arg("topic", "Topic to publish.").Required().String()
 	publishArgs        = publish.Arg("args", "Provide the arguments.").Strings()
 	publishKeywordArgs = publish.Flag("kwarg", "Provide the keyword arguments.").Short('k').StringMap()
-	publishOptions     = publish.Flag("option", "Publish option.(May be call multiple times)").Short('o').StringMap()
+	publishOptions     = publish.Flag("option", "Publish option. (May be provided multiple times)").Short('o').StringMap()
 	repeatPublish      = publish.Flag("repeat", "Publish to the topic for the provided number of times.").Default("1").Int()
 	logPublishTime     = publish.Flag("time", "Log publish return time.").Bool()
 	delayPublish       = publish.Flag("delay", "Provide the delay in milliseconds.").Default("0").Int()
@@ -74,7 +74,7 @@ var (
 	onInvocationCmd   = register.Arg("command", "Shell command to run and return it's output.").String()
 	delay             = register.Flag("delay", "Register procedure after delay.(in milliseconds)").Int()
 	invokeCount       = register.Flag("invoke-count", "Leave session after it's called requested times.").Int()
-	registerOptions   = register.Flag("option", "Procedure registration option.(May be call multiple times)").Short('o').StringMap()
+	registerOptions   = register.Flag("option", "Procedure registration option. (May be provided multiple times)").Short('o').StringMap()
 
 	call            = kingpin.Command("call", "Call a procedure.")
 	callProcedure   = call.Arg("procedure", "Procedure to call.").Required().String()
@@ -83,7 +83,7 @@ var (
 	logCallTime     = call.Flag("time", "Log call return time.").Bool()
 	repeatCount     = call.Flag("repeat", "Call the procedure for the provided number of times.").Default("1").Int()
 	delayCall       = call.Flag("delay", "Provide the delay in milliseconds.").Default("0").Int()
-	callOptions     = call.Flag("option", "Procedure call option.(May be call multiple times)").Short('o').StringMap()
+	callOptions     = call.Flag("option", "Procedure call option. (May be provided multiple times)").Short('o').StringMap()
 	parallelCall    = call.Flag("parallel", "Call the procedure parallel without waiting for the result to return. "+
 		"Only effective when called with --repeat.").Bool()
 )
