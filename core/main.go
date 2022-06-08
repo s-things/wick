@@ -279,15 +279,15 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 }
 
 func Call(session *client.Client, procedure string, args []string, kwargs map[string]string,
-	logCallTime bool, repeatCount int, delayCall int, parallelCall int, callOptions map[string]string) {
+	logCallTime bool, repeatCount int, delayCall int, concurrencyCall int, callOptions map[string]string) {
 
 	var startTime int64
 	if logCallTime {
 		startTime = time.Now().UnixMilli()
 	}
 
-	if parallelCall > 1 {
-		concurrentGoroutines := make(chan struct{}, parallelCall)
+	if concurrencyCall > 1 {
+		concurrentGoroutines := make(chan struct{}, concurrencyCall)
 		var wg sync.WaitGroup
 
 		for i := 0; i < repeatCount; i++ {
