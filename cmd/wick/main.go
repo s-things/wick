@@ -85,7 +85,7 @@ var (
 	delayCall       = call.Flag("delay", "Provide the delay in milliseconds.").Default("0").Int()
 	callOptions     = call.Flag("option", "Procedure call option. (May be provided multiple times)").Short('o').StringMap()
 	parallelCall    = call.Flag("parallel", "Call the procedure parallel without waiting for the result to return. "+
-		"Only effective when called with --repeat.").Bool()
+		"Only effective when called with --repeat.").Default("1").Int()
 )
 
 const versionString = "0.4.0-dev"
