@@ -84,7 +84,7 @@ var (
 	repeatCount     = call.Flag("repeat", "Call the procedure for the provided number of times.").Default("1").Int()
 	delayCall       = call.Flag("delay", "Provide the delay in milliseconds.").Default("0").Int()
 	callOptions     = call.Flag("option", "Procedure call option. (May be provided multiple times)").Short('o').StringMap()
-	concurrencyCall = call.Flag("concurrency", "Call the procedure concurrent N times without waiting for the result to return. "+
+	concurrentCalls = call.Flag("concurrency", "Make concurrent calls without waiting for the result for each to return. "+
 		"Only effective when called with --repeat.").Default("1").Int()
 )
 
@@ -169,6 +169,6 @@ func main() {
 			logger.Fatal("repeat count must be greater than zero")
 		}
 		core.Call(session, *callProcedure, *callArgs, *callKeywordArgs, *logCallTime, *repeatCount, *delayCall,
-			*concurrencyCall, *callOptions)
+			*concurrentCalls, *callOptions)
 	}
 }
