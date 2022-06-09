@@ -66,7 +66,7 @@ var (
 	repeatPublish      = publish.Flag("repeat", "Publish to the topic for the provided number of times.").Default("1").Int()
 	logPublishTime     = publish.Flag("time", "Log publish return time.").Bool()
 	delayPublish       = publish.Flag("delay", "Provide the delay in milliseconds.").Default("0").Int()
-	concurrentPublish  = publish.Flag("concurrency", "Publish the topic concurrent without waiting for the result for each to return. "+
+	concurrentPublish  = publish.Flag("concurrency", "Publish to the topic concurrently. "+
 		"Only effective when called with --repeat.").Default("1").Int()
 
 	register          = kingpin.Command("register", "Register a procedure.")
