@@ -154,15 +154,15 @@ func actualPublish(session *client.Client, topic string, args []string, kwargs m
 }
 
 func Publish(session *client.Client, topic string, args []string, kwargs map[string]string, publishOptions map[string]string,
-	logPublishTime bool, repeatPublish int, delayPublish int, parallelPublish int) {
+	logPublishTime bool, repeatPublish int, delayPublish int, concurrency int) {
 
 	var startTime int64
 	if logPublishTime {
 		startTime = time.Now().UnixMilli()
 	}
 
-	if parallelPublish > 1 {
-		concurrentGoroutines := make(chan struct{}, parallelPublish)
+	if concurrency > 1 {
+		concurrentGoroutines := make(chan struct{}, concurrency)
 		var wg sync.WaitGroup
 
 		for i := 0; i < repeatPublish; i++ {
