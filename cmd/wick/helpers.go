@@ -24,7 +24,14 @@
 
 package main
 
-import "github.com/gammazero/nexus/v3/transport/serialize"
+import (
+	"fmt"
+	"github.com/gammazero/nexus/v3/transport/serialize"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/ini.v1"
+	"os"
+	"runtime"
+)
 
 func getSerializerByName(name string) serialize.Serialization {
 
@@ -49,4 +56,49 @@ func selectAuthMethod(privateKey string, ticket string, secret string) string {
 	}
 
 	return "anonymous"
+}
+
+func userHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	} else if runtime.GOOS == "linux" {
+		home := os.Getenv("XDG_CONFIG_HOME")
+		if home != "" {
+			return home
+		}
+	}
+	return os.Getenv("HOME")
+}
+
+func readFromProfile(logger *logrus.Logger) {
+	cfg, err := ini.Load(fmt.Sprintf("%s/.wick/config", userHomeDir()))
+	if err != nil {
+		logger.Fatal("Fail to read config: %v", err)
+	}
+	*url = cfg.Section(*profile).Key("url").Validate(func(s string) string {
+		if len(s) == 0 {
+			return "ws://localhost:8080/ws"
+		}
+		return s
+	})
+	*realm = cfg.Section(*profile).Key("realm").Validate(func(s string) string {
+		if len(s) == 0 {
+			return "realm1"
+		}
+		return s
+	})
+	*authid = cfg.Section(*profile).Key("authid").String()
+	*authrole = cfg.Section(*profile).Key("authrole").String()
+	*authMethod = cfg.Section(*profile).Key("authmethod").String()
+	if *authMethod == "cryptosign" {
+		*privateKey = cfg.Section(*profile).Key("private-key").String()
+	} else if *authMethod == "ticket" {
+		*ticket = cfg.Section(*profile).Key("ticket").String()
+	} else if *authMethod == "wampcra" {
+		*secret = cfg.Section(*profile).Key("secret").String()
+	}
 }

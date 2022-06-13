@@ -52,6 +52,7 @@ var (
 		Envar("WICK_TICKET").String()
 	serializer = kingpin.Flag("serializer", "The serializer to use.").Envar("WICK_SERIALIZER").
 			Default("json").Enum("json", "msgpack", "cbor")
+	profile = kingpin.Flag("profile", "").Envar("WICK_PROFILE").String()
 
 	subscribe             = kingpin.Command("subscribe", "Subscribe a topic.")
 	subscribeTopic        = subscribe.Arg("topic", "Topic to subscribe.").Required().String()
@@ -97,6 +98,10 @@ func main() {
 	serializerToUse := getSerializerByName(*serializer)
 
 	logger := logrus.New()
+
+	if *profile != "" {
+		readFromProfile(logger)
+	}
 
 	if *privateKey != "" && *ticket != "" {
 		logger.Fatal("Provide only one of private key, ticket or secret")

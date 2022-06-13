@@ -6,6 +6,7 @@ require (
 	github.com/gammazero/nexus/v3 v3.0.3
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
+	gopkg.in/ini.v1 v1.66.6
 )
 
 require golang.org/x/sys v0.0.0-20220519141025-dcacdad47464 // indirect
