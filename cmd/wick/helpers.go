@@ -79,26 +79,32 @@ func readFromProfile(logger *logrus.Logger) {
 	if err != nil {
 		logger.Fatalf("Fail to read config: %v", err)
 	}
-	*url = cfg.Section(*profile).Key("url").Validate(func(s string) string {
+
+	section, err := cfg.GetSection(*profile)
+	if err != nil {
+		logger.Fatalf("Error in getting section: %s", err)
+	}
+
+	*url = section.Key("url").Validate(func(s string) string {
 		if len(s) == 0 {
 			return "ws://localhost:8080/ws"
 		}
 		return s
 	})
-	*realm = cfg.Section(*profile).Key("realm").Validate(func(s string) string {
+	*realm = section.Key("realm").Validate(func(s string) string {
 		if len(s) == 0 {
 			return "realm1"
 		}
 		return s
 	})
-	*authid = cfg.Section(*profile).Key("authid").String()
-	*authrole = cfg.Section(*profile).Key("authrole").String()
-	*authMethod = cfg.Section(*profile).Key("authmethod").String()
+	*authid = section.Key("authid").String()
+	*authrole = section.Key("authrole").String()
+	*authMethod = section.Key("authmethod").String()
 	if *authMethod == "cryptosign" {
-		*privateKey = cfg.Section(*profile).Key("private-key").String()
+		*privateKey = section.Key("private-key").String()
 	} else if *authMethod == "ticket" {
-		*ticket = cfg.Section(*profile).Key("ticket").String()
+		*ticket = section.Key("ticket").String()
 	} else if *authMethod == "wampcra" {
-		*secret = cfg.Section(*profile).Key("secret").String()
+		*secret = section.Key("secret").String()
 	}
 }
