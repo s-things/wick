@@ -77,7 +77,7 @@ func userHomeDir() string {
 func readFromProfile(logger *logrus.Logger) {
 	cfg, err := ini.Load(fmt.Sprintf("%s/.wick/config", userHomeDir()))
 	if err != nil {
-		logger.Fatal("Fail to read config: %v", err)
+		logger.Fatal("Fail to read config: %s", err)
 	}
 	*url = cfg.Section(*profile).Key("url").Validate(func(s string) string {
 		if len(s) == 0 {
