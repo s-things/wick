@@ -266,7 +266,17 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 		startTime = time.Now().UnixMilli()
 	}
 
-	result, err := session.Call(context.Background(), procedure, dictToWampDict(callOptions), listToWampList(args), dictToWampDict(kwargs), nil)
+	options := dictToWampDict(callOptions)
+	var result *wamp.Result
+	var err error
+	if options["receive_progress"] != nil && options["receive_progress"] == true {
+		result, err = session.Call(context.Background(), procedure, options, listToWampList(args), dictToWampDict(kwargs), func(progress *wamp.Result) {
+			logger.Println(progress.Arguments)
+			logger.Println(progress.ArgumentsKw)
+		})
+	} else {
+		result, err = session.Call(context.Background(), procedure, options, listToWampList(args), dictToWampDict(kwargs), nil)
+	}
 	if err != nil {
 		logger.Fatal(err)
 	} else if result != nil && len(result.Arguments) > 0 {
