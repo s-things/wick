@@ -31,7 +31,6 @@ import (
 	"fmt"
 	"github.com/gammazero/nexus/v3/wamp"
 	"golang.org/x/crypto/ed25519"
-	"log"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -101,7 +100,7 @@ func argsKWArgs(args wamp.List, kwArgs wamp.Dict, details wamp.Dict) {
 		fmt.Println("args:")
 		jsonString, err := json.MarshalIndent(args, "", "    ")
 		if err != nil {
-			log.Fatal(err)
+			logger.Fatal(err)
 		}
 		fmt.Println(string(jsonString))
 	}
@@ -110,7 +109,7 @@ func argsKWArgs(args wamp.List, kwArgs wamp.Dict, details wamp.Dict) {
 		fmt.Println("kwargs:")
 		jsonString, err := json.MarshalIndent(kwArgs, "", "    ")
 		if err != nil {
-			log.Fatal(err)
+			logger.Fatal(err)
 		}
 		fmt.Println(string(jsonString))
 	}
@@ -119,6 +118,25 @@ func argsKWArgs(args wamp.List, kwArgs wamp.Dict, details wamp.Dict) {
 		fmt.Println("args: []")
 		fmt.Println("kwargs: {}")
 	}
+}
+
+func progressArgsKWArgs(args wamp.List, kwArgs wamp.Dict) {
+
+	if len(args) != 0 {
+		fmt.Print("args: ", args, "  ")
+	}
+
+	if len(kwArgs) != 0 {
+		fmt.Print("kwargs: ")
+		bs, _ := json.Marshal(kwArgs)
+		fmt.Print(string(bs))
+	}
+
+	if len(args) == 0 && len(kwArgs) == 0 {
+		fmt.Print("args: []", "kwargs: {}")
+	}
+
+	fmt.Println()
 }
 
 func shellOut(command string) (error, string, string) {

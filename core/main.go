@@ -271,8 +271,7 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 	var err error
 	if options["receive_progress"] != nil && options["receive_progress"] == true {
 		result, err = session.Call(context.Background(), procedure, options, listToWampList(args), dictToWampDict(kwargs), func(progress *wamp.Result) {
-			logger.Println(progress.Arguments)
-			logger.Println(progress.ArgumentsKw)
+			progressArgsKWArgs(progress.Arguments, progress.ArgumentsKw)
 		})
 	} else {
 		result, err = session.Call(context.Background(), procedure, options, listToWampList(args), dictToWampDict(kwargs), nil)
