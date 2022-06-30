@@ -175,3 +175,10 @@ func sanitizeURL(url string) string {
 	}
 	return url
 }
+
+func asciiToCharacters(jsonBytes []byte) []byte {
+	jsonBytes = bytes.Replace(jsonBytes, []byte("\\u003c"), []byte("<"), -1)
+	jsonBytes = bytes.Replace(jsonBytes, []byte("\\u003e"), []byte(">"), -1)
+	jsonBytes = bytes.Replace(jsonBytes, []byte("\\u0026"), []byte("&"), -1)
+	return jsonBytes
+}

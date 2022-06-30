@@ -283,6 +283,7 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 		if err != nil {
 			logger.Fatal(err)
 		}
+		jsonString = asciiToCharacters(jsonString)
 		fmt.Println(string(jsonString))
 	}
 
