@@ -51,3 +51,20 @@ func TestUrlSanitization(t *testing.T) {
 		t.Error("url sanitization failed")
 	}
 }
+
+func TestAsciiToCharacter(t *testing.T) {
+	jsonBytes := asciiToCharacters([]byte("test\\u0026"))
+	if string(jsonBytes) != "test&" {
+		t.Error("error in replacing ascii")
+	}
+
+	jsonBytes = asciiToCharacters([]byte("test\\u003c"))
+	if string(jsonBytes) != "test<" {
+		t.Error("error in replacing ascii")
+	}
+
+	jsonBytes = asciiToCharacters([]byte("test\\u003e"))
+	if string(jsonBytes) != "test>" {
+		t.Error("error in replacing ascii")
+	}
+}

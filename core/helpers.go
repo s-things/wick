@@ -29,11 +29,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/gammazero/nexus/v3/wamp"
-	"golang.org/x/crypto/ed25519"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"golang.org/x/crypto/ed25519"
+
+	"github.com/gammazero/nexus/v3/wamp"
 )
 
 func listToWampList(args []string) wamp.List {
@@ -174,4 +176,13 @@ func sanitizeURL(url string) string {
 		return "tcp" + strings.TrimPrefix(url, "rss")
 	}
 	return url
+}
+
+func asciiToCharacters(jsonBytes []byte) []byte {
+	characterMap := map[string]string{"\\u003c": "<", "\\u003e": ">", "\\u0026": "&"}
+
+	for key, value := range characterMap {
+		jsonBytes = bytes.Replace(jsonBytes, []byte(key), []byte(value), -1)
+	}
+	return jsonBytes
 }

@@ -28,7 +28,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"sync"
@@ -37,6 +36,7 @@ import (
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/transport/serialize"
 	"github.com/gammazero/nexus/v3/wamp"
+	"github.com/sirupsen/logrus"
 )
 
 var logger *logrus.Logger
@@ -283,6 +283,7 @@ func actuallyCall(session *client.Client, procedure string, args []string, kwarg
 		if err != nil {
 			logger.Fatal(err)
 		}
+		jsonString = asciiToCharacters(jsonString)
 		fmt.Println(string(jsonString))
 	}
 

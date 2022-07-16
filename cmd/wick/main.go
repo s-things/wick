@@ -25,10 +25,12 @@
 package main
 
 import (
+	"time"
+
+	"gopkg.in/alecthomas/kingpin.v2"
+
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/alecthomas/kingpin.v2"
-	"time"
 
 	"github.com/s-things/wick/core"
 )

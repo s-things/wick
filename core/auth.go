@@ -26,6 +26,7 @@ package core
 
 import (
 	"encoding/hex"
+
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/transport/serialize"
 	"github.com/gammazero/nexus/v3/wamp"
