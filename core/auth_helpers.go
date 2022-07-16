@@ -28,10 +28,12 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
-	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/gammazero/nexus/v3/wamp/crsign"
+
 	"golang.org/x/crypto/ed25519"
 	"golang.org/x/crypto/pbkdf2"
+
+	"github.com/gammazero/nexus/v3/wamp"
+	"github.com/gammazero/nexus/v3/wamp/crsign"
 )
 
 func handleCRAAuth(secret string) func(c *wamp.Challenge) (string, wamp.Dict) {

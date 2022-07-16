@@ -29,11 +29,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/gammazero/nexus/v3/wamp"
-	"golang.org/x/crypto/ed25519"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"golang.org/x/crypto/ed25519"
+
+	"github.com/gammazero/nexus/v3/wamp"
 )
 
 func listToWampList(args []string) wamp.List {

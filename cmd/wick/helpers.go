@@ -26,10 +26,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+
+	"gopkg.in/ini.v1"
+
 	"github.com/gammazero/nexus/v3/transport/serialize"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/ini.v1"
-	"os"
 )
 
 func getSerializerByName(name string) serialize.Serialization {
